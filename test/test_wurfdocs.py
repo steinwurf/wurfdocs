@@ -18,4 +18,5 @@ def test_build_docs(testdirectory):
 
     # The log file should have zero size - i.e. now warnings or errors..
     # As you can see we are not quite there :)
-    assert os.path.getsize(log_file) == 620
+    print(log_file)
+    assert os.path.getsize(log_file) == 148

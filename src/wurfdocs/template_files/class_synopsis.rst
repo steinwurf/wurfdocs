@@ -1,7 +1,7 @@
 {%- macro create_heading(class, char='=') -%}
-{%- set name = class["name"] -%}
+{%- set name = class["type"] + " " + class["name"] -%}
 {%- set size = name|length -%}
-{{class["type"]}} {{name}}
+{{name}}
 {% for n in range(size) %}{{char}}{% endfor %}
 {%- endmacro -%}
 
@@ -23,6 +23,7 @@
 .. _{{unique_name}}:
 
 - {{function['return_type']}} {{ create_function_signature(unique_name, function)}}
+
 {{function['briefdescription']}}
 {{function['detaileddescription']}}
 
