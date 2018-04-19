@@ -1,1 +1,1 @@
-from wurfdocs import setup
+from .wurfdocs_directive import setup

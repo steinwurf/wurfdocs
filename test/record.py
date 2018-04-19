@@ -100,6 +100,7 @@ class TextRecord(object):
         with open(self.recording_path, 'r') as recording_file:
             recording_data = recording_file.read()
 
+        assert type(recording_data) == type(data)
         if recording_data == data:
             return
 

@@ -56,10 +56,10 @@ def find_version():
         filepath=os.path.join(cwd, 'wscript'))
 
     wurfdocs_VERSION = file_find_version(
-        filepath=os.path.join(cwd, 'src/wurfdocs/wurfdocs.py'))
+        filepath=os.path.join(cwd, 'src/wurfdocs/wurfdocs_directive.py'))
 
     if wscript_VERSION != wurfdocs_VERSION:
-        sys.exit('Version mismatch wscript and src/wurfdocs/wurfdocs.py')
+        sys.exit('Version mismatch wscript and src/wurfdocs/wurfdocs_directive.py')
 
     return wscript_VERSION
 
@@ -96,7 +96,7 @@ setup(
         'Topic :: Utilities',
     ],
     entry_points={
-        'console_scripts': ['wurfdocs=wurfdocs.wurfdocs:main'],
+        'console_scripts': ['wurfdocs=wurfdocs.wurfdocs_directive:main'],
     },
     keywords=('wurfdocs'),
     packages=find_packages(where='src', exclude=['test']),
