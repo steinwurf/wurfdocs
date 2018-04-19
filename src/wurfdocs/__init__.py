@@ -1,0 +1,1 @@
+from wurfdocs import setup
