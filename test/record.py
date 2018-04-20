@@ -153,9 +153,8 @@ class JsonRecord(TextRecord):
         super(JsonRecord, self).record(data=data)
 
 
+# Extension map for the different output files we support
 extension_map = {
     '.json': JsonRecord,
     '.rst': TextRecord
-
-
 }
