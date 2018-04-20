@@ -269,7 +269,8 @@ class DoxygenParser(object):
 
         assert(os.path.isfile(index_path))
 
-        index_xml = pyquery.PyQuery(filename=index_path, parser='xml')
+        index_xml = pyquery.PyQuery(
+            filename=index_path, parser='xml', encoding='utf-8')
 
         # We extract the compound definitions XML "compunddef" tag
         # These contain the information we need.
@@ -284,7 +285,7 @@ class DoxygenParser(object):
             compound_path = os.path.join(doxygen_path, compound_filename)
 
             compound_xml = pyquery.PyQuery(
-                filename=compound_path, parser='xml')
+                filename=compound_path, parser='xml', encoding='utf-8')
 
             # There can be multiple "compunddef" tags in each XML file
             # according to Doxygen's generated compound.xsd file
