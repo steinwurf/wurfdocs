@@ -20,53 +20,37 @@ else:
     from urllib.parse import urlparse
 
 
-download_filename = {
-    'linux': 'doxygen-1.8.14.linux.bin.tar.gz',
-}
-
-download_base_urls = {
-    'linux': 'http://ftp.stack.nl/pub/users/dimitri'
+# On these platforms we support downloading doxygen
+supported_platforms = {
+    'linux': 'http://ftp.stack.nl/pub/users/dimitri/'
+    'doxygen-1.8.14.linux.bin.tar.gz'
 }
 
 
 def current_platform():
-    """Get current platform name by short string."""
+
     if sys.platform.startswith('linux'):
         return 'linux'
-
-    elif sys.platform.startswith('win'):
-        if sys.maxsize > 2 ** 31 - 1:
-            return 'win64'
-        return 'win32'
 
     raise OSError('Unsupported platform: ' + sys.platform)
 
 
-def download_url():
+def download_url(platform):
 
-    platform = current_platform()
+    if platform in supported_platforms:
+        return supported_platforms[platform]
 
-    url = os.path.join(
-        download_base_urls[platform], download_filename[platform])
-
-    return url
+    raise OSError('Unsupported platform: ' + sys.platform)
 
 
-def download(cwd, url):
+def download(url, filepath):
     """ Download the file specified by the source.
     :param cwd: The directory where to download the file.
-    :param source: The URL of the file to download.
+    :param url: The URL of the file to download.
     :param filename: The filename to store the file under.
     """
 
-    platform = current_platform()
-
-    filename = download_filename[platform]
-    url = os.path.join(download_base_urls[platform], filename)
-
     response = urlopen(url=url)
-
-    filepath = os.path.join(cwd, filename)
 
     # From http://stackoverflow.com/a/1517728
     CHUNK = 16 * 1024
@@ -76,8 +60,6 @@ def download(cwd, url):
             if not chunk:
                 break
             f.write(chunk)
-
-    return filepath
 
 
 # def extract(cwd, filena):

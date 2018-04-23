@@ -1,23 +1,33 @@
 import mock
 import os
+import vcr
 
 import wurfdocs
 import wurfdocs.doxygen_downloader
 
 
-def test_doxygen_downloader(testdirectory):
-    pass
-    # wurfdocs.doxygen_downloader.extract(
-    #     cwd=testdirectory.path())
+@vcr.use_cassette('test/data/archive/test_files.yaml')
+def test_doxygen_downloader_download(testdirectory):
+
+    # If you want to change the file downloaded - you also need to update the
+    # url - such that VCR can make the recording. After the recording
+    # has been made it is not necessary that the url stays alive.
+
+    url = 'https://github.com/steinwurf/wurfdocs/raw/' \
+        'intial-commit/test/data/archive/test_files.zip'
+
+    filepath = os.path.join(testdirectory.path(), 'test_files.zip')
+
+    wurfdocs.doxygen_downloader.download(url=url, filepath=filepath)
+    assert os.path.isfile(filepath)
 
 
-# @vcr.use_cassette('test/vcr_cassettes/https_cxx_prettyprint_resolver.yaml')
-# def test_url_download_cxx_prettyprint_rename(testdirectory):
-#     source = 'https://github.com/louisdx/cxx-prettyprint/zipball/master'
-#     cwd = testdirectory.path()
+def test_doxygen_downloader_download_url(testdirectory):
 
-#     download = UrlDownload()
+    for platform in wurfdocs.doxygen_downloader.supported_platforms.keys():
+        assert wurfdocs.doxygen_downloader.download_url(platform) != ""
 
-#     path = download.download(cwd=cwd, source=source, filename='test.zip')
 
-#     assert os.path.join(cwd, 'test.zip') == path
+def test_doxygen_downloader_current_platform():
+
+    return wurfdocs.doxygen_downloader.current_platform() in ['linux']
