@@ -47,6 +47,11 @@ def options(opt):
         '--pytest_basetemp', default='pytest_temp',
         help='Set the basetemp folder where pytest executes the tests')
 
+    opt.add_option(
+        '--run_download_tests', default=False, action='store_true',
+        help='Run the unit tests that use network resources'
+        ' (downloading Doxygen')
+
 
 def configure(conf):
     pass
@@ -129,12 +134,30 @@ def _pytest(bld):
         venv.env['PATH'] = os.path.pathsep.join(
             [venv.env['PATH'], os.environ['PATH']])
 
+        # Main test command
+        command = 'python -B -m pytest {} --basetemp {}'.format(
+            testdir.abspath(), basetemp)
+
+        # Skip the tests that have the "download_test" marker
+        command += ' -m "not download_test"'
+
         # Make python not write any .pyc files. These may linger around
         # in the file system and make some tests pass although their .py
         # counter-part has been e.g. deleted
-        venv.run(cmd='python -B -m pytest {} --basetemp {}'.format(
-            testdir.abspath(), basetemp),
-            cwd=bld.path)
+        venv.run(cmd=command, cwd=bld.path)
+
+        if bld.options.run_download_tests:
+            # Main test command
+            command = 'python -B -m pytest {} --basetemp {}'.format(
+                testdir.abspath(), basetemp)
+
+            # Skip the tests that have the "download_test" marker
+            command += ' -m "download_test"'
+
+            # Make python not write any .pyc files. These may linger around
+            # in the file system and make some tests pass although their .py
+            # counter-part has been e.g. deleted
+            venv.run(cmd=command, cwd=bld.path)
 
         # Check readme
         # https://stackoverflow.com/a/49107899/1717320

@@ -68,7 +68,10 @@ To use the extension, the following steps are needed:
       extensions = ['wurfdocs']
 
       # Wurfdocs options - relative to your docs dir
-      wurfdocs = {'source_path': '../src'}
+      wurfdocs = {
+        'source_path': '../src',
+        'parser': {'type': 'doxygen', 'download': True }
+      }
 
 5. To generate the API documentation for a class open a ``.rst`` file
    e.g. ``index.rst`` if you ran ``sphinx-quickstart``. Say we want to
