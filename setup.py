@@ -108,5 +108,5 @@ setup(
     #
     package_data={"wurfdocs": ["template_files/*"]},
 
-    install_requires=['pyquery'],
+    install_requires=['pyquery', 'python-archive'],
 )

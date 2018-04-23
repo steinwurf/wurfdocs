@@ -4,6 +4,7 @@
 import cgi
 import os
 import sys
+import archive
 
 from .compat import IS_PY2
 
@@ -19,9 +20,12 @@ else:
     from urllib.parse import urlparse
 
 
-download_urls = {
-    'linux': 'http://ftp.stack.nl/pub/users/dimitri/doxygen-1.8.14.linux.bin.tar.gz',
+download_filename = {
+    'linux': 'doxygen-1.8.14.linux.bin.tar.gz',
+}
 
+download_base_urls = {
+    'linux': 'http://ftp.stack.nl/pub/users/dimitri'
 }
 
 
@@ -39,33 +43,28 @@ def current_platform():
 
 
 def download_url():
-    return download_urls[current_platform()]
+
+    platform = current_platform()
+
+    url = os.path.join(
+        download_base_urls[platform], download_filename[platform])
+
+    return url
 
 
-def response_filename(response):
-    """ Returns the filename contained in the HTTP Content-Disposition
-    header.
-    """
-    # Try to get the file name from the headers
-    header = response.info().get('Content-Disposition', '')
-
-    if not header:
-        return None
-
-    _, params = cgi.parse_header(header)
-    return params.get('filename', None)
-
-
-def download(cwd):
+def download(cwd, url):
     """ Download the file specified by the source.
     :param cwd: The directory where to download the file.
     :param source: The URL of the file to download.
     :param filename: The filename to store the file under.
     """
 
-    response = urlopen(url=download_url())
+    platform = current_platform()
 
-    filename = response_filename(response=response)
+    filename = download_filename[platform]
+    url = os.path.join(download_base_urls[platform], filename)
+
+    response = urlopen(url=url)
 
     filepath = os.path.join(cwd, filename)
 
@@ -79,3 +78,8 @@ def download(cwd):
             f.write(chunk)
 
     return filepath
+
+
+# def extract(cwd, filena):
+#     filepath = download(cwd=cwd)
+#     return archive.extract(filepath)
