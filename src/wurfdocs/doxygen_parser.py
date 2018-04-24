@@ -112,7 +112,7 @@ def parse_class_or_struct(parser, xml):
     # Get the location
     location = xml.children('location')
     file_path = location.attr("file")
-    file_path = parser.relative_path(path=file_path)
+    file_path = parser.relative_path(path=file_path).replace(r'\\', '/')
 
     file_line_start = int(location.attr("line"))
 
