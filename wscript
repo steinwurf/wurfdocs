@@ -146,7 +146,7 @@ def _pytest(bld):
             testdir.abspath(), os.path.join(basetemp, 'unit_tests'))
 
         # Skip the tests that have the "download_test" marker
-        command += ' -m "not download_test" -m "not ensure_doxygen"'
+        command += ' -m "not download_test and not ensure_doxygen"'
 
         # Make python not write any .pyc files. These may linger around
         # in the file system and make some tests pass although their .py
