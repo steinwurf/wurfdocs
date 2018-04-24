@@ -112,7 +112,7 @@ def parse_class_or_struct(parser, xml):
     # Get the location
     location = xml.children('location')
     file_path = location.attr("file")
-    file_path = parser.relative_path(path=file_path).replace('\\', '/')
+    file_path = parser.relative_path(path=file_path)
 
     file_line_start = int(location.attr("line"))
 
@@ -253,7 +253,12 @@ class DoxygenParser(object):
 
     def relative_path(self, path):
         """ Return the relative path from the project_path """
-        return os.path.relpath(path=path, start=self.project_path)
+        path = os.path.relpath(path=path, start=self.project_path)
+
+        # Make sure we use unix / linux style paths - also on windows
+        path = path.replace('\\', '/')
+
+        return path
 
     @staticmethod
     def xml_from_path(doxygen_path):
