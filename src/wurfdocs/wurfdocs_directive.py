@@ -13,6 +13,7 @@ import sphinx.util.nodes
 
 import pyquery
 import json
+import logging
 
 from . import doxygen_generator
 from . import doxygen_parser
@@ -116,7 +117,14 @@ def generate_doxygen(app):
     if not os.path.exists(output_path):
         os.makedirs(name=output_path)
 
-    logger = sphinx.util.logging.getLogger('wurfdocs')
+    # Sphinx colorizes the log output differently on windows and linux
+    # so we manually create a logger in the sphinx namespace
+    # add sphinx prefix to name forcely
+    logger = logging.getLogger(
+        sphinx.util.logging.NAMESPACE + '.' + 'wurfdocs')
+    # Forcely enable logger
+    logger.disabled = False
+
     logger.info('wurfdocs source_path={} output_path={}'.format(
         source_path, output_path))
 
