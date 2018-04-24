@@ -207,7 +207,7 @@ class DoxygenParser(object):
 
             else:
                 kind = element.attr('kind')
-                self.log.warning('Not supported {}'.format(kind))
+                self.log.warning('Not supported {}'.format(kind), color=None)
 
         return api
 
