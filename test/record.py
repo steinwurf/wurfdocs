@@ -156,5 +156,6 @@ class JsonRecord(TextRecord):
 # Extension map for the different output files we support
 extension_map = {
     '.json': JsonRecord,
-    '.rst': TextRecord
+    '.rst': TextRecord,
+    '.txt': TextRecord
 }

@@ -1,5 +1,7 @@
 import os
 
+import record
+
 
 def test_run(testdirectory):
 
@@ -18,9 +20,14 @@ def test_build_docs(testdirectory):
 
     # The log file should have zero size - i.e. now warnings or errors..
     # As you can see we are not quite there :)
-    print(log_file)
-
     with open(log_file, 'r') as log:
-        print("Log content\n{}".format(log.read()))
+        log_data = log.read()
 
-    assert os.path.getsize(log_file) == 148
+    mismatch_path = testdirectory.mkdir('mismatch')
+
+    recorder = record.Record(
+        filename='log.txt',
+        recording_path='test/data/log_recordings',
+        mismatch_path=mismatch_path.path())
+
+    recorder.record(data=log_data)
