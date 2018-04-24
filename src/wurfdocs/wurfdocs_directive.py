@@ -125,8 +125,8 @@ def generate_doxygen(app):
     # Forcely enable logger
     logger.disabled = False
 
-    for handler in logger.handlers[:]:
-        logger.removeHandler(handler)
+    for handler in logger.formatters[:]:
+        logger.removeFormatter(handler)
 
     logger.info('wurfdocs source_path={} output_path={}'.format(
         source_path, output_path))
