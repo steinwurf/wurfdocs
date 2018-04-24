@@ -28,7 +28,9 @@ ALIASES += "endrst=\endverbatim"
 
 class DoxygenGenerator(object):
 
-    def __init__(self, runner, recursive, source_path, output_path):
+    def __init__(self, doxygen_executable, runner, recursive,
+                 source_path, output_path):
+        self.doxygen_executable = doxygen_executable
         self.runner = runner
         self.recursive = recursive
         self.source_path = source_path
@@ -63,7 +65,8 @@ class DoxygenGenerator(object):
         # @todo: Doxygen generates a bunch of warnings. We should
         #        propagate these somehow - if you want to know what
         #        has not been documented etc.
-        self.runner.run(command='doxygen Doxyfile', cwd=self.output_path)
+        self.runner.run(command=self.doxygen_executable + ' Doxyfile',
+                        cwd=self.output_path)
 
         # The Doxygen XML is written to the 'xml' subfolder of the
         # output directory

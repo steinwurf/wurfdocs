@@ -45,12 +45,16 @@ def options(opt):
 
     opt.add_option(
         '--pytest_basetemp', default='pytest_temp',
-        help='Set the basetemp folder where pytest executes the tests')
+        help='Set the prefix folder where pytest executes the tests')
 
     opt.add_option(
         '--run_download_tests', default=False, action='store_true',
         help='Run the unit tests that use network resources'
         ' (downloading Doxygen')
+
+    opt.add_option(
+        '--run_ensure_doxygen', default=False, action='store_true',
+        help='Ensure that doxygen is available (will retrieve a fresh copy)')
 
 
 def configure(conf):
@@ -130,16 +134,19 @@ def _pytest(bld):
 
         testdir = bld.path.find_node('test')
 
-        # We need to be able to run doxygen
-        venv.env['PATH'] = os.path.pathsep.join(
-            [venv.env['PATH'], os.environ['PATH']])
+        # Make the basetemp directory
+        os.makedirs(basetemp)
+
+        # If we need to be able to run doxygen from the system
+        # venv.env['PATH'] = os.path.pathsep.join(
+        #    [venv.env['PATH'], os.environ['PATH']])
 
         # Main test command
         command = 'python -B -m pytest {} --basetemp {}'.format(
-            testdir.abspath(), basetemp)
+            testdir.abspath(), os.path.join(basetemp, 'unit_tests'))
 
         # Skip the tests that have the "download_test" marker
-        command += ' -m "not download_test"'
+        command += ' -m "not download_test" -m "not ensure_doxygen"'
 
         # Make python not write any .pyc files. These may linger around
         # in the file system and make some tests pass although their .py
@@ -149,10 +156,23 @@ def _pytest(bld):
         if bld.options.run_download_tests:
             # Main test command
             command = 'python -B -m pytest {} --basetemp {}'.format(
-                testdir.abspath(), basetemp)
+                testdir.abspath(), os.path.join(basetemp, 'download_tests'))
 
             # Skip the tests that have the "download_test" marker
             command += ' -m "download_test"'
+
+            # Make python not write any .pyc files. These may linger around
+            # in the file system and make some tests pass although their .py
+            # counter-part has been e.g. deleted
+            venv.run(cmd=command, cwd=bld.path)
+
+        if bld.options.run_ensure_doxygen:
+            # Main test command
+            command = 'python -B -m pytest {} --basetemp {}'.format(
+                testdir.abspath(), os.path.join(basetemp, 'ensure_doxygen'))
+
+            # Skip the tests that have the "download_test" marker
+            command += ' -m "ensure_doxygen"'
 
             # Make python not write any .pyc files. These may linger around
             # in the file system and make some tests pass although their .py

@@ -16,6 +16,7 @@ import json
 
 from . import doxygen_generator
 from . import doxygen_parser
+from . import doxygen_downloader
 from . import run
 from . import template_render
 from . import wurfdocs_error
@@ -119,7 +120,23 @@ def generate_doxygen(app):
     logger.info('wurfdocs source_path={} output_path={}'.format(
         source_path, output_path))
 
+    parser = app.config.wurfdocs['parser']
+    assert parser['type'] == 'doxygen'
+
+    if parser['download']:
+
+        if 'download_path' in parser:
+            download_path = parser['download_path']
+        else:
+            download_path = None
+
+        doxygen_executable = doxygen_downloader.ensure_doxygen(
+            download_path=download_path)
+    else:
+        doxygen_executable = 'doxygen'
+
     generator = doxygen_generator.DoxygenGenerator(
+        doxygen_executable=doxygen_executable,
         runner=run,
         recursive=True,
         source_path=source_path,

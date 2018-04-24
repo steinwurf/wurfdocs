@@ -26,7 +26,29 @@ else:
 # http://ftp.stack.nl/pub/users/dimitri/doxygen-1.8.14.windows.x64.bin.zip
 
 BASE_URL = "http://ftp.stack.nl/pub/users/dimitri/"
-VERSION = "1.8.14"
+
+# Version 1.8.14 has a broken Linux binary:
+# https://bugzilla.gnome.org/show_bug.cgi?id=792761
+# it is linked with libclang but does not ship with it, so you get the following
+# error:
+#
+#     doxygen: error while loading shared libraries: libclang.so.6: cannot
+#     open shared object file: No such file or directory
+#
+# Running ldd gives:
+#
+# 	linux-vdso.so.1 =>  (0x00007ffc883a8000)
+#   libpthread.so.0 => /lib/x86_64-linux-gnu/libpthread.so.0 (0x00007f39d96e3000)
+#   libclang.so.6 => not found
+#   libtinfo.so.5 => /lib/x86_64-linux-gnu/libtinfo.so.5 (0x00007f39d94ba000)
+#   libz.so.1 => /lib/x86_64-linux-gnu/libz.so.1 (0x00007f39d929d000)
+#   libstdc++.so.6 => /usr/lib/x86_64-linux-gnu/libstdc++.so.6 (0x00007f39d8f17000)
+#   libm.so.6 => /lib/x86_64-linux-gnu/libm.so.6 (0x00007f39d8bc1000)
+#   libgcc_s.so.1 => /lib/x86_64-linux-gnu/libgcc_s.so.1 (0x00007f39d89aa000)
+#   libc.so.6 => /lib/x86_64-linux-gnu/libc.so.6 (0x00007f39d85ca000)
+#   /lib64/ld-linux-x86-64.so.2 (0x00007f39d9902000)
+
+VERSION = "1.8.13"
 
 
 def current_platform():
@@ -61,7 +83,7 @@ def archive_name(platform):
     raise OSError('Unsupported platform: ' + platform)
 
 
-def doxygen_exectuable(from_path, platform):
+def doxygen_executable(from_path, platform):
 
     if platform == 'linux':
         return os.path.join(from_path, 'doxygen-' + VERSION, 'bin/doxygen')
@@ -134,7 +156,7 @@ def download_doxygen(platform=None, download_path=None):
 
     extract_archive(from_path=archive_path, to_path=download_path)
 
-    executable = doxygen_exectuable(from_path=download_path, platform=platform)
+    executable = doxygen_executable(from_path=download_path, platform=platform)
 
     assert os.path.isfile(executable)
 
@@ -149,14 +171,20 @@ def check_doxygen(platform=None, download_path=None):
     if download_path == None:
         download_path = default_download_path()
 
-    executable = doxygen_exectuable(from_path=download_path, platform=platform)
+    executable = doxygen_executable(from_path=download_path, platform=platform)
 
     return os.path.isfile(executable)
 
 
 def ensure_doxygen(platform=None, download_path=None):
 
+    if platform == None:
+        platform = current_platform()
+
+    if download_path == None:
+        download_path = default_download_path()
+
     if check_doxygen(platform=platform, download_path=download_path):
-        return doxygen_exectuable(platform=platform, from_path=download_path)
+        return doxygen_executable(platform=platform, from_path=download_path)
     else:
         return download_doxygen(platform=platform, download_path=download_path)

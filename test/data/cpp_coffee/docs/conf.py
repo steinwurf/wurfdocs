@@ -50,7 +50,10 @@ copyright = u'2018, Coffee'
 author = u'Coffee'
 
 # Wurfdocs options
-wurfdocs = {'source_path': '../src'}
+wurfdocs = {
+    'source_path': '../src',
+    'parser': {'type': 'doxygen', 'download': True}
+}
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the

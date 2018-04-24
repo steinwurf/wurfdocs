@@ -5,6 +5,7 @@ import wurfdocs
 import wurfdocs.doxygen_generator
 import wurfdocs.doxygen_parser
 import wurfdocs.template_render
+import wurfdocs.doxygen_downloader
 
 import record
 
@@ -16,7 +17,10 @@ def generate_coffee_api(testdirectory):
     coffee_dir = testdirectory.copy_dir('test/data/cpp_coffee')
     src_dir = coffee_dir.join('src')
 
+    doxygen_executable = wurfdocs.doxygen_downloader.ensure_doxygen()
+
     generator = wurfdocs.doxygen_generator.DoxygenGenerator(
+        doxygen_executable=doxygen_executable,
         runner=wurfdocs.run,
         recursive=True,
         source_path=src_dir.path(),

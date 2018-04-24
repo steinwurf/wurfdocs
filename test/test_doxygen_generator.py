@@ -3,6 +3,7 @@ import os
 
 import wurfdocs
 import wurfdocs.doxygen_generator
+import wurfdocs.doxygen_downloader
 import wurfdocs.run
 
 
@@ -13,7 +14,10 @@ def test_doxygen_generator(testdirectory):
 
     runner = mock.Mock()
 
+    doxygen_executable = wurfdocs.doxygen_downloader.ensure_doxygen()
+
     generator = wurfdocs.doxygen_generator.DoxygenGenerator(
+        doxygen_executable=doxygen_executable,
         runner=wurfdocs.run,
         recursive=True,
         source_path=coffee_dir.path(),

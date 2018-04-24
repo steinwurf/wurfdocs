@@ -2,6 +2,7 @@ import mock
 import os
 import vcr
 import pytest
+import shutil
 
 import wurfdocs
 import wurfdocs.doxygen_downloader
@@ -54,6 +55,9 @@ def test_doxygen_downloader_download_linux(testdirectory):
 
     assert os.path.isfile(executable)
 
+    if wurfdocs.doxygen_downloader.current_platform() == 'linux':
+        testdirectory.run(executable+' --version')
+
 
 @pytest.mark.download_test
 def test_doxygen_downloader_download_win32(testdirectory):
@@ -71,6 +75,19 @@ def test_doxygen_downloader_download_win64(testdirectory):
 
     wurfdocs.doxygen_downloader.download_doxygen(
         download_path=download_path, platform='win64')
+
+
+@pytest.mark.ensure_doxygen
+def test_doxygen_downloader_ensure_doxygen():
+
+    default_path = wurfdocs.doxygen_downloader.default_download_path()
+
+    shutil.rmtree(default_path)
+
+    executable = wurfdocs.doxygen_downloader.ensure_doxygen()
+
+    assert os.path.isfile(executable)
+
 
 # def test_doxygen_downloader_paths(testdirectory):
 
