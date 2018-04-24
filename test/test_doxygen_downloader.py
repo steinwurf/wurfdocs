@@ -32,7 +32,8 @@ def test_doxygen_downloader_download(testdirectory):
 
 def test_doxygen_downloader_current_platform():
 
-    assert wurfdocs.doxygen_downloader.current_platform() in ['linux']
+    assert wurfdocs.doxygen_downloader.current_platform() in [
+        'linux', 'win64', 'win32']
 
 
 @pytest.mark.download_test
