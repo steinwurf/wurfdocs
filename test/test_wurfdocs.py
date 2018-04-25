@@ -14,7 +14,7 @@ def test_build_docs(testdirectory):
     cpp_coffee = testdirectory.copy_dir(directory='test/data/cpp_coffee')
 
     docs = cpp_coffee.join('docs')
-    docs.run('sphinx-build -w log.txt -b html . _build')
+    docs.run('sphinx-build --no-color -w log.txt -b html . _build')
 
     log_file = os.path.join(docs.path(), 'log.txt')
 

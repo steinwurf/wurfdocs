@@ -1,4 +1,5 @@
 import os
+import sys
 
 import docutils.nodes
 import docutils.parsers
@@ -118,15 +119,30 @@ def generate_doxygen(app):
         os.makedirs(name=output_path)
 
     # Sphinx colorizes the log output differently on windows and linux
-    # so we manually create a logger in the sphinx namespace
-    # add sphinx prefix to name forcely
-    logger = logging.getLogger(
-        sphinx.util.logging.NAMESPACE + '.' + 'wurfdocs')
-    # Forcely enable logger
-    logger.disabled = False
+    # so we manually create a logger which, like sphinx, sends anything
+    # below debug to stdout and above to stderr
+    logger = sphinx.util.logging.getLogger('wurfdocs')
 
-    for handler in logger.formatters[:]:
-        logger.removeFormatter(handler)
+    # class LessThanFilter(logging.Filter):
+    #     def __init__(self, exclusive_maximum, name=""):
+    #         super(LessThanFilter, self).__init__(name)
+    #         self.max_level = exclusive_maximum
+
+    #     def filter(self, record):
+    #         # non-zero return means we log this message
+    #         return 1 if record.levelno < self.max_level else 0
+
+    # # Have to set the root logger level, it defaults to logging.WARNING
+    # logger.setLevel(logging.NOTSET)
+
+    # logging_handler_out = logging.StreamHandler(sys.stdout)
+    # logging_handler_out.setLevel(logging.DEBUG)
+    # logging_handler_out.addFilter(LessThanFilter(logging.WARNING))
+    # logger.addHandler(logging_handler_out)
+
+    # logging_handler_err = logging.StreamHandler(sys.stderr)
+    # logging_handler_err.setLevel(logging.WARNING)
+    # logger.addHandler(logging_handler_err)
 
     logger.info('wurfdocs source_path={} output_path={}'.format(
         source_path, output_path))
