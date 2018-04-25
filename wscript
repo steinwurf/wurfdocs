@@ -183,6 +183,9 @@ def _pytest(bld):
         # https://stackoverflow.com/a/49107899/1717320
         venv.run(cmd='python setup.py check -r -s', cwd=bld.path)
 
+        venv.pip_install(['collective.checkdocs'])
+        venv.run(cmd='python setup.py checkdocs', cwd=bld.path)
+
 
 def _create_virtualenv(bld):
 
