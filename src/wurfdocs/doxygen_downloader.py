@@ -7,6 +7,7 @@ import sys
 import archive
 
 from .compat import IS_PY2
+from .wurfdocs_error import WurfdocsError
 
 if IS_PY2:
 
@@ -51,10 +52,28 @@ BASE_URL = "http://ftp.stack.nl/pub/users/dimitri/"
 VERSION = "1.8.13"
 
 
+class DoxygenUnsupportedError(WurfdocsError):
+
+    def __init__(self, platform):
+        msg = "Unsupported platform for doxygen auto download {}\n".format(
+            platform)
+
+        msg += "See README.rst at github.com/steinwurf/wurfdocs on how\n"
+        msg += "to install Doxygen on your system and use that."
+
+        super(DoxygenUnsupportedError, self).__init__(msg)
+
+
 def current_platform():
 
     if sys.platform.startswith('linux'):
-        return 'linux'
+        # Checking for 64 bit
+        # https://docs.python.org/3/library/platform.html#cross-platform
+
+        if sys.maxsize > 2**32:
+            return "linux64"
+        else:
+            return "linux32"
 
     if sys.platform.startswith('win'):
 
@@ -66,12 +85,12 @@ def current_platform():
         else:
             return "win32"
 
-    raise OSError('Unsupported platform: ' + sys.platform)
+    raise DoxygenUnsupportedError(sys.platform)
 
 
 def archive_name(platform):
 
-    if platform == 'linux':
+    if platform == 'linux64':
         return 'doxygen-' + VERSION + '.linux.bin.tar.gz'
 
     if platform == 'win32':
@@ -80,12 +99,12 @@ def archive_name(platform):
     if platform == 'win64':
         return 'doxygen-' + VERSION + '.windows.x64.bin.zip'
 
-    raise OSError('Unsupported platform: ' + platform)
+    raise DoxygenUnsupportedError(platform)
 
 
 def doxygen_executable(from_path, platform):
 
-    if platform == 'linux':
+    if platform == 'linux64':
         return os.path.join(from_path, 'doxygen-' + VERSION, 'bin/doxygen')
 
     if platform == 'win32':
@@ -94,7 +113,7 @@ def doxygen_executable(from_path, platform):
     if platform == 'win64':
         return os.path.join(from_path, 'doxygen.exe')
 
-    raise OSError('Unsupported platform: ' + platform)
+    raise DoxygenUnsupportedError(platform)
 
 
 def doxygen_url(platform):

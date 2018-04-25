@@ -79,11 +79,6 @@ class WurfDocsDirective(docutils.parsers.rst.Directive):
             selector=self.options['selector'], api=app.wurfdocs_api,
             filename=template_path)
 
-        output_path = os.path.join(app.doctreedir, 'wurfdocs')
-
-        with open(os.path.join(output_path, 'tem.rst'), 'w') as w:
-            w.write(data)
-
         return self.insert_rst(data)
 
     def insert_rst(self, rst):
