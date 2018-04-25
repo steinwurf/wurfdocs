@@ -73,6 +73,11 @@ To use the extension, the following steps are needed:
         'parser': {'type': 'doxygen', 'download': True }
       }
 
+   Note: if you do not want to automatically download Doxygen, set
+   ``download`` to ``False``. In that case ``wurfdocs`` will try to invoke
+   plain ``doxygen`` without specifying any path or similar. This means
+   it ``doxygen`` must be available in the path.
+
 5. To generate the API documentation for a class open a ``.rst`` file
    e.g. ``index.rst`` if you ran ``sphinx-quickstart``. Say we want to
    generate docs for a class called ``test`` in the namespace ``project``.
