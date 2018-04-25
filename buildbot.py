@@ -35,31 +35,31 @@ def install(properties):
     pass
 
 
-# def main():
-#     argv = sys.argv
-
-#     if len(argv) < 2:
-#         print("Usage: {} <command> <properties>".format(argv[0]))
-#         sys.exit(0)
-
-#     cmd = argv[1]
-#     properties = {}
-#     if len(argv) == 3:
-#         properties = json.loads(argv[2])
-
-#     if cmd == 'configure':
-#         configure(properties)
-#     elif cmd == 'build':
-#         build(properties)
-#     elif cmd == 'run_tests':
-#         run_tests(properties)
-#     elif cmd == 'install':
-#         install(properties)
-#     else:
-#         print("Unknown command: {}".format(cmd))
-
 def main():
-    print("Enable tests")
+    argv = sys.argv
+
+    if len(argv) < 2:
+        print("Usage: {} <command> <properties>".format(argv[0]))
+        sys.exit(0)
+
+    cmd = argv[1]
+    properties = {}
+    if len(argv) == 3:
+        properties = json.loads(argv[2])
+
+    if cmd == 'configure':
+        configure(properties)
+    elif cmd == 'build':
+        build(properties)
+    elif cmd == 'run_tests':
+        run_tests(properties)
+    elif cmd == 'install':
+        install(properties)
+    else:
+        print("Unknown command: {}".format(cmd))
+
+# def main():
+#     print("Enable tests")
 
 
 if __name__ == '__main__':
