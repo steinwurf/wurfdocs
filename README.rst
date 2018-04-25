@@ -109,6 +109,14 @@ To use the extension, the following steps are needed:
 
     To do this we use the ``class_synopsis.rst`` template.
 
+Running on readthedocs.org
+--------------------------
+
+To use this on readthedocs.org you need to have the ``wurfdocs`` Sphinx
+extension installed. This can be done by adding a ``requirements.txt`` in the
+documentation folder. readthedocs.org can be configured to use the
+``requirements.txt`` when building a project. Simply put ``wurfdocs`` in to the
+``requirements.txt``.
 
 Relase new version
 ==================
