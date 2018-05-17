@@ -10,6 +10,7 @@ def test_build(testdirectory):
            '--output_path', output_dir.path()]
 
     r = testdirectory.run(cmd)
+
     print(r)
 
     # pass
