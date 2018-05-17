@@ -21,8 +21,9 @@ import wurfdocs.tasks
 
 class Factory(object):
 
-    def __init__(self):
+    def __init__(self, build_name):
 
+        self.build_name = build_name
         self.providers = {}
 
     def provide_value(self, name, value):
@@ -43,31 +44,34 @@ class Factory(object):
 
         self.providers[name] = call
 
-    def build(self, name):
+    def require(self, name):
         return self.providers[name]()
 
+    def build(self):
+        return self.require(name=self.build_name)
 
-def build_prompt(factory):
+
+def require_prompt(factory):
     return wurfdocs.commandline.Prompt()
 
 
-def build_git(factory):
+def require_git(factory):
 
-    prompt = factory.build(name='prompt')
-    git_binary = factory.build(name='git_binary')
+    prompt = factory.require(name='prompt')
+    git_binary = factory.require(name='git_binary')
 
     return wurfdocs.git.Git(git_binary=git_binary, prompt=prompt)
 
 
-def build_git_url_parser(factory):
+def require_git_url_parser(factory):
     return wurfdocs.git_url_parser.GitUrlParser()
 
 
-def build_virtualenv(factory):
+def require_virtualenv(factory):
 
-    git = factory.build(name='git')
-    clone_path = factory.build(name='clone_path')
-    virtualenv_root_path = factory.build(name='virtualenv_root_path')
+    git = factory.require(name='git')
+    clone_path = factory.require(name='clone_path')
+    virtualenv_root_path = factory.require(name='virtualenv_root_path')
     log = logging.getLogger(name='wurfdocs.virtualenv')
 
     venv = wurfdocs.virtualenv.VirtualEnv.from_git(
@@ -79,35 +83,35 @@ def build_virtualenv(factory):
     return venv
 
 
-def build_sphinx_environment(factory):
+def require_sphinx_environment(factory):
 
-    prompt = factory.build(name='prompt')
-    virtualenv = factory.build(name='virtualenv')
+    prompt = factory.require(name='prompt')
+    virtualenv = factory.require(name='virtualenv')
 
     return wurfdocs.sphinx_environment.SphinxEnvironment(
         prompt=prompt, virtualenv=virtualenv)
 
 
-def build_sphinx_config(factory):
+def require_sphinx_config(factory):
     return wurfdocs.sphinx_config.SphinxConfig()
 
 
-def build_sphinx(factory):
+def require_sphinx(factory):
 
-    sphinx_config = factory.build(name='sphinx_config')
-    sphinx_environment = factory.build(name='sphinx_environment')
-    prompt = factory.build(name='prompt')
+    sphinx_config = factory.require(name='sphinx_config')
+    sphinx_environment = factory.require(name='sphinx_environment')
+    prompt = factory.require(name='prompt')
 
     return wurfdocs.sphinx.Sphinx(
         sphinx_config=sphinx_config, sphinx_environment=sphinx_environment,
         prompt=prompt)
 
 
-def build_git_repository(factory):
-    git = factory.build(name='git')
-    git_url_parser = factory.build(name='git_url_parser')
+def require_git_repository(factory):
+    git = factory.require(name='git')
+    git_url_parser = factory.require(name='git_url_parser')
     log = logging.getLogger(name='wurfdocs.git_repository')
-    clone_path = factory.build(name='clone_path')
+    clone_path = factory.require(name='clone_path')
 
     return wurfdocs.git_repository.GitRepository(
         git=git, git_url_parser=git_url_parser, clone_path=clone_path,
@@ -116,27 +120,27 @@ def build_git_repository(factory):
 
 def provide_clone_path(factory):
 
-    data_path = factory.build(name='data_path')
+    data_path = factory.require(name='data_path')
 
     return os.path.join(data_path, 'clones')
 
 
-def build_cache(factory):
+def require_cache(factory):
 
-    data_path = factory.build(name='data_path')
-    unique_name = factory.build(name='unique_name')
+    data_path = factory.require(name='data_path')
+    unique_name = factory.require(name='unique_name')
 
     return wurfdocs.cache.Cache(
         cache_path=data_path, unique_name=unique_name)
 
 
-def build_task_generator(factory):
+def require_task_generator(factory):
 
-    output_path = factory.build(name='output_path')
-    git_repository = factory.build(name='git_repository')
-    sphinx = factory.build(name='sphinx')
-    git = factory.build(name='git')
-    cache = factory.build(name='cache')
+    output_path = factory.require(name='output_path')
+    git_repository = factory.require(name='git_repository')
+    sphinx = factory.require(name='sphinx')
+    git = factory.require(name='git')
+    cache = factory.require(name='cache')
 
     workingtree_generator = wurfdocs.tasks.WorkingtreeGenerator(
         repository=git_repository,
@@ -161,34 +165,34 @@ def build_task_generator(factory):
 
 def resolve_factory(data_path):
 
-    factory = Factory()
+    factory = Factory(build_name='git_repository')
 
     factory.provide_value(name='git_binary', value='git')
     factory.provide_value(name='data_path', value=data_path)
     factory.provide_function(name='clone_path', function=provide_clone_path)
     factory.provide_function(name='git_url_parser',
-                             function=build_git_url_parser)
-    factory.provide_function(name='git', function=build_git)
+                             function=require_git_url_parser)
+    factory.provide_function(name='git', function=require_git)
     factory.provide_function(name='git_repository',
-                             function=build_git_repository)
-    factory.provide_function(name='prompt', function=build_prompt)
+                             function=require_git_repository)
+    factory.provide_function(name='prompt', function=require_prompt)
 
     return factory
 
 
 def cache_factory(data_path, unique_name):
 
-    factory = Factory()
+    factory = Factory(build_name='cache')
     factory.provide_value(name='data_path', value=data_path)
     factory.provide_value(name='unique_name', value=unique_name)
-    factory.provide_function(name='cache', function=build_cache)
+    factory.provide_function(name='cache', function=require_cache)
 
     return factory
 
 
 def build_factory(data_path, output_path, git_repository, cache):
 
-    factory = Factory()
+    factory = Factory(build_name='task_generator')
 
     virtualenv_root_path = os.path.join(data_path, 'virtualenvs')
 
@@ -201,22 +205,22 @@ def build_factory(data_path, output_path, git_repository, cache):
     factory.provide_value(name='output_path', value=output_path)
     factory.provide_value(name='virtualenv_root_path',
                           value=virtualenv_root_path)
-    factory.provide_function(name='prompt', function=build_prompt)
+    factory.provide_function(name='prompt', function=require_prompt)
     factory.provide_function(name='git_url_parser',
-                             function=build_git_url_parser)
-    factory.provide_function(name='git', function=build_git)
-    factory.provide_function(name='virtualenv', function=build_virtualenv)
+                             function=require_git_url_parser)
+    factory.provide_function(name='git', function=require_git)
+    factory.provide_function(name='virtualenv', function=require_virtualenv)
     factory.provide_function(name='sphinx_environment',
-                             function=build_sphinx_environment)
+                             function=require_sphinx_environment)
     factory.provide_function(name='sphinx_config',
-                             function=build_sphinx_config)
+                             function=require_sphinx_config)
     factory.provide_function(name='sphinx',
-                             function=build_sphinx)
+                             function=require_sphinx)
 
     factory.provide_value(name='git_repository',
                           value=git_repository)
 
     factory.provide_function(name='task_generator',
-                             function=build_task_generator)
+                             function=require_task_generator)
 
     return factory

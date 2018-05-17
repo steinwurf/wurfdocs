@@ -23,14 +23,14 @@ def cli(repository, data_path, output_path):
     factory = wurfdocs.factory.resolve_factory(
         data_path=data_path)
 
-    git_repository = factory.build(name='git_repository')
+    git_repository = factory.build()
     git_repository.clone(repository=repository)
 
     # Instantiate the cache
     cache_factory = wurfdocs.factory.cache_factory(
         data_path=data_path, unique_name=git_repository.unique_name)
 
-    cache = cache_factory.build(name='cache')
+    cache = cache_factory.build()
 
     # Build the documentation
     factory = wurfdocs.factory.build_factory(
@@ -44,7 +44,7 @@ def cli(repository, data_path, output_path):
 
     with cache:
 
-        task_generator = factory.build(name='task_generator')
+        task_generator = factory.build()
 
         tasks = task_generator.tasks()
 
