@@ -1,8 +1,6 @@
-import os
-
 import wurfdocs
-import wurfdocs.run
+#import wurfdocs.run
 
 
-def test_run(testdirectory):
-    wurfdocs.run.run('python --version', cwd=testdirectory.path())
+# def test_run(testdirectory):
+#     r = wurfdocs.run('python --version', cwd=testdirectory.path())

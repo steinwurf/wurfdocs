@@ -12,7 +12,8 @@ class CheckOutput(object):
         """ Creates a new CheckOutput object
         :param output: String representing the output
         """
-        self.output = output.splitlines()
+        self.output = output
+        self.lines = output.splitlines()
 
     def match(self, pattern):
         """ Matches the lines in the output with the pattern. The match
@@ -38,7 +39,7 @@ class CheckOutput(object):
         :return: True if the pattern is found in one or more of the output
                  lines.
         """
-        match_lines = fnmatch.filter(self.output, pattern)
+        match_lines = fnmatch.filter(self.lines, pattern)
         return len(match_lines) > 0
 
     def __str__(self):
@@ -46,11 +47,11 @@ class CheckOutput(object):
         Generate a single string representation of the output.
         :return: A string representing the output.
         """
-        return '\n'.join(self.output)
+        return self.output
 
     def __repr__(self):
         """
         Generate a string representation of this object for pretty prints.
         :return: A string representing the output.
         """
-        return 'CheckOutput: "{}"'.format('\n'.join(self.output))
+        return 'CheckOutput: "{}"'.format(self.output)

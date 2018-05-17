@@ -1,7 +1,5 @@
-from . import wurfdocs_error
 
-
-class RunError(wurfdocs_error.WurfdocsError):
+class RunError(RuntimeError):
     """Basic exception for errors raised when running commands."""
 
     def __init__(self, run_result):
