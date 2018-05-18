@@ -52,3 +52,60 @@ techniques for writing testable code is dependency injection (DI).
 In Python DI is relatively simple to implement due to the dynamic nature of the
 language.
 
+
+Deployment
+----------
+
+We need a way to publish documentation such that developers can inspect
+and verify changes before exposing them to users.
+
+Using Source Branch
+-------------------
+
+One way to do this is to separate builds/output based on the source
+branch.
+
+So if we are building the ``master`` branch builds will go to the root
+of the output directory.
+
+Other branches are placed in a ``development/branch-name`` sub-folder.
+
+Update flow:
+
+ * I'm building some branch ``my-update``.
+ * This is now available under ``development/my-update`` on the
+   ``gh_pages`` site.
+
+
+Generating index
+................
+
+To make it easy to see the different development versions of the
+documentation. We can generate an index in the root of the
+``development`` folder.
+
+Cleaning up old branches
+------------------------
+
+If the ``prune`` flag is passed any branches not available on the
+remote will be removed.
+
+Describe builds
+---------------
+
+wurfdocs.json
+{
+    'build': [
+        {'type': 'sphinx',
+         'recurse': true,
+         'output_path': 'docs',
+         'source_path': 'docs'
+         }
+        {'type': 'python',
+         'output_path': '.',
+         'source_path': 'landing_page',
+         'requirements': 'landing_page\requriements.txt',
+         'shell': 'python generate.py %(versions_json)s'
+         }
+    ]
+}
