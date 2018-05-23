@@ -95,25 +95,32 @@ Describe builds
 
 wurfdocs.json
 {
-    'versions': {
-        checkout: ['bla', 'bla2']
+    'variables': [
+        { 'switch: %SOURCE_BRANCH,
+          'case': 'master'
+          'default':
+    ]
+        push_dir =
         build: {
 
         }
 
     },
-    'build': [
+    'steps': [
         {'type': 'sphinx',
          'recurse': true,
          'output_path': '%BUILD_DIR%/docs',
          'source_path': '%CLONE_DIR%/docs'
-         }
+         },
         {'type': 'python',
-         'output_path': '.',
+         'output_path': '%BUILD_DIR/.',
          'source_path': '%CLONE_DIR%/landing_page',
          'requirements': '%CLONE_DIR%/requriements.txt',
-         'shell': 'python generate.py %(versions_json)s'
-         }
+         'shell': 'python generate.py --versions=%BUILD_DIR/docs'
+         },
+         {'type': 'push',
+          'branch': 'gh_pages',
+          'remote_dir':
     ]
 }
 
