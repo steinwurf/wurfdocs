@@ -93,35 +93,53 @@ remote will be removed.
 Describe builds
 ---------------
 
-wurfdocs.json
+wurfpipe.json
 {
-    'variables': [
-        { 'switch: %SOURCE_BRANCH,
-          'case': 'master'
-          'default':
-    ]
-        push_dir =
-        build: {
-
+    'build': [
+        {
+            'type': 'python',
+            'recurse': true,
+            'cwd': ${CLONE_PATH}/docs,
+            'requirements': '${CLONE_PATH}/docs/requirements.txt',
+            'script': 'python sphinx-build -b html . ${BUILD_PATH}/docs/${RECURSE_ID}'
+        },
+        {
+            'type': 'python',
+            'cwd': ${CLONE_PATH}/landing_page,
+            'requirements': '${CLONE_PATH}/landing_page/requirements.txt',
+            'script': 'python generate.py --versions=${BUILD_PATH}/docs --output_path=${BUILD_PATH}'
+         }
+    ],
+    'publish': [
+        {
+            'type': 'push',
+            'include_branch: 'master',
+            'remote_branch': 'gh_pages',
+            'remote_path': '.',
+            'source_path': '${BUILD_PATH}'
+        },
+        {
+            'type': 'push',
+            'exclude_branch: 'master',
+            'remote_branch': 'gh_pages',
+            'remote_path': 'experimental/${SOURCE_BRANCH}',
+            'source_path': '${BUILD_PATH}'
         }
-
-    },
-    'steps': [
-        {'type': 'sphinx',
-         'recurse': true,
-         'output_path': '%BUILD_DIR%/docs',
-         'source_path': '%CLONE_DIR%/docs'
-         },
-        {'type': 'python',
-         'output_path': '%BUILD_DIR/.',
-         'source_path': '%CLONE_DIR%/landing_page',
-         'requirements': '%CLONE_DIR%/requriements.txt',
-         'shell': 'python generate.py --versions=%BUILD_DIR/docs'
-         },
-         {'type': 'push',
-          'branch': 'gh_pages',
-          'remote_dir':
     ]
 }
+
+./wurfdocs build https://stub.git --build_path=/tmp/out --clone_path=/tmp/clone
+./wurfdocs publish https://stub.git --build_path=/tmp/out
+
+
+def build(ctx):
+    ctx.add_step(type='python',
+                 recurse=True,
+                 cwd='${CLONE_PATH},
+                 requirements='${CLONE_PATH}/docs/requirements.txt',
+            'script': 'python sphinx-build -b html . ${BUILD_PATH}/docs/${RECURSE_ID}'
+
+def publish(ctx):
+
 
 
