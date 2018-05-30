@@ -1,0 +1,42 @@
+{ 
+    "sphinx":
+    {
+        "type": "python",
+        "script": ["${cmd}"],
+        "requirements": "${clone_path}/docs/requirements.txt",
+        "cwd": "${clone_path}/docs",
+        "allow_failure": true,
+        "recurse_tags": true,
+        "variables": {
+            "source_branch:master:output_path": "{build_path}/docs/latest",
+            "source_branch:output_path": "{build_path}/sphinx/experiments/${branch_name}",
+            "tag:output_path": "{build_path]/docs/${tag_name$}",
+            "workingtree:output_path": "{build_path}/sphinx/experiments/workingtree",
+            "source_branch:cmd": "python sphinx-build -b html . ${output_path}"
+        }
+    },
+    "landing_page":
+    {
+        "type": "python",
+        "script": ["python generate.py --versions=${build_path}/docs --output_path=${output_path}"],
+        "requirements": "${clone_path}/landing_page/requirements.txt",
+        "cwd": "${clone_path}/landing_page",
+        "allow_failure": true,
+        "variables": {
+            "source_branch:master:output_path": "{build_path}",
+            "source_branch:output_path": "{build_path}/landing_page/experiments/${branch_name}",
+            "workingtree:output_path": "{build_path}/landing_page/experiments/workingtree",
+        }
+    },
+    "publish":
+    {
+        "type": "push",
+        "remote_branch": "gh_pages",
+        "exclude_paths": [
+            "{build_path}/landing_page/experiments/workingtree",
+            "{build_path}/sphinx/experiments/workingtree"
+        ],
+        "remote_path": ".",
+        "source_path": "${build_path}"
+    }
+}

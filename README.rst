@@ -93,45 +93,43 @@ remote will be removed.
 Describe builds
 ---------------
 
-wurfpipe.json
-{
-    'build': [
-        {
-            'type': 'python',
-            'recurse': true,
-            'cwd': ${CLONE_PATH}/docs,
-            'requirements': '${CLONE_PATH}/docs/requirements.txt',
-            'workingtree':
-                'script': 'python sphinx-build -b html . ${BUILD_PATH}/workingtree'
-            'branches':
-                'script: 'python sphinx-build -b html . ${BUILD_PATH}/branches/${RECURSE_ID}'
-            'tags':
-                'script: 'python sphinx-build -b html . ${BUILD_PATH}/docs/${RECURSE_ID}'
-        },
-        {
-            'type': 'python',
-            'cwd': ${CLONE_PATH}/landing_page,
-            'requirements': '${CLONE_PATH}/landing_page/requirements.txt',
-            'script': 'python generate.py --versions=${BUILD_PATH}/docs --output_path=${BUILD_PATH}'
-         }
-    ],
-    'publish': [
-        {
-            'type': 'push',
-            'include_branch: 'master',
-            'remote_branch': 'gh_pages',
-            'remote_path': '.',
-            'source_path': '${BUILD_PATH}'
-        },
-        {
-            'type': 'push',
-            'exclude_branch: 'master',
-            'remote_branch': 'gh_pages',
-            'remote_path': 'experimental/${SOURCE_BRANCH}',
-            'source_path': '${BUILD_PATH}'
+Lets see how to describe builds in ``wurfdocs.json``, we start out by 
+adding a key ``builds``::
+
+    {
+        'builds': {
         }
-    ]
-}
+    }
+
+We can now specify the different builds for this project. Let's make 
+a `sphinx` build::
+
+    {
+        'builds': {
+            'sphinx': {
+
+            }
+        }
+    }
+
+We now have a build called ``sphinx`` which contains no steps. Lets add a step::
+
+    {
+        'builds': {
+            'sphinx': [
+                {
+                    'type': 'python',
+                    'script': 'pyhon --version'
+                }
+            ]
+        }
+    }
+
+We can now invoke our pipeline ``build`` by running::
+
+    wurfpipe build . --build_path /tmp/build --wurfpipe_path /tmp/wurfpipe
+
+
 
 ./wurfdocs build https://stub.git --build_path=/tmp/out --clone_path=/tmp/clone
 ./wurfdocs publish https://stub.git --build_path=/tmp/out
@@ -237,7 +235,7 @@ branch or tag name. The selector has to be an exact match.
 
 The final element is the name of the variable.
 
-    'build':[
+    'sphinx':
     {
         'type': 'python'
         'script': python sphinx-build -b html . ${output_path},
@@ -251,6 +249,7 @@ The final element is the name of the variable.
             'tag:output_path': '{build_path]/docs/${tag_name$}'
             'workingtree:output_path': '{build_path}/sphinx/experiments/workingtree
     },
+    'landing_page':
     {
         'type': 'python'
         'script': 'python generate.py --versions=${build_path}/docs --output_path=${output_path}'
@@ -261,19 +260,19 @@ The final element is the name of the variable.
             'source_branch:master:output_path': '{build_path}'
             'source_branch:output_path': '{build_path}/landing_page/experiments/${branch_name}
             'workingtree:output_path': '{build_path}/landing_page/experiments/workingtree
-    }],
-    'publish':[
-        {
-            'type': 'push',
-            'remote_branch': 'gh_pages',
-            'exclude_paths: [
-                '{build_path}/landing_page/experiments/workingtree',
-                '{build_path}/sphinx/experiments/workingtree'
-            ],
-            'remote_path': '.',
-            'source_path': '${build_path}'
-        }
-    ]
+    },
+    'publish':
+    {
+        'type': 'push',
+        'remote_branch': 'gh_pages',
+        'exclude_paths: [
+            '{build_path}/landing_page/experiments/workingtree',
+            '{build_path}/sphinx/experiments/workingtree'
+        ],
+        'remote_path': '.',
+        'source_path': '${build_path}'
+    }
+
 
 
 

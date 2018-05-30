@@ -9,9 +9,13 @@ def test_build(testdirectory):
            '--data_path', data_dir.path(),
            '--output_path', output_dir.path()]
 
+    r = testdirectory.run('wurfdocs --help')
+    print(r)
+    assert 0
+    
     r = testdirectory.run(cmd)
 
-    print(r)
+    #print(r)
 
     # pass
 

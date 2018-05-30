@@ -8,7 +8,6 @@ import shutil
 import logging
 
 import wurfdocs.git
-from . import command
 from . import commandline
 
 URL = 'https://github.com/pypa/virtualenv.git'

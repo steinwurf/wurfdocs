@@ -9,15 +9,19 @@ import wurfdocs.factory
 import wurfdocs.build_info
 
 
-@click.group(invoke_without_command=True)
-@click.option('--repository')
-@click.option('--data_path')
-@click.option('--output_path')
-def cli(repository, data_path, output_path):
+@click.command()
+@click.option('--build_path')
+@click.option('--wurfdocs_path')
+@click.option('--config_file')
+@click.argument('step')
+@click.argument('repository')
+def cli(step, repository, build_path, wurfdocs_path, config_file):
 
     logging.basicConfig(filename='wurfdocs.log', level=logging.DEBUG)
 
     log = logging.getLogger('wurfdocs.main')
+
+    return
 
     # Resolve the repository
     factory = wurfdocs.factory.resolve_factory(
@@ -73,10 +77,6 @@ def cli(repository, data_path, output_path):
     # If needed push the docs
 
 
-@cli.command()
-@click.argument('DEST_BRANCH')
-def push(dest_branch):
-    click.echo('push to %s' % dest_branch)
 
 
 if __name__ == "__main__":
