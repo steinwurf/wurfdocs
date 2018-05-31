@@ -1,21 +1,19 @@
 def test_build(testdirectory):
 
-    data_dir = testdirectory.mkdir('data')
-    output_dir = testdirectory.mkdir('output')
+    build_dir = testdirectory.mkdir('build')
+    wurfdocs_dir = testdirectory.mkdir('wurfdocs')
+    config_file = testdirectory.copy_file('test/data/wurfdocs.json')
 
     url = 'git@github.com:steinwurf/stub.git'
 
-    cmd = ['wurfdocs', '--repository', url,
-           '--data_path', data_dir.path(),
-           '--output_path', output_dir.path()]
+    cmd = ['wurfdocs', 'sphinx', url,
+           '--build_path', build_dir.path(),
+           '--wurfdocs_path', wurfdocs_dir.path(),
+           '--json_config', config_file]
 
-    r = testdirectory.run('wurfdocs --help')
-    print(r)
-    assert 0
-    
     r = testdirectory.run(cmd)
 
-    #print(r)
+    # print(r)
 
     # pass
 

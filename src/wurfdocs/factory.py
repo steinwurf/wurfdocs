@@ -163,6 +163,18 @@ def require_task_generator(factory):
     return task_generator
 
 
+def require_python_generator(factory):
+
+    python_prompt = factory.require(name='python_prompt')
+
+    workingtree_generator = wurfdocs.tasks.WorkingtreeGenerator(
+        repository=git_repository,
+        output_path=output_path, python_prompt=python_prompt)
+
+    task_generator = wurfdocs.tasks.TaskFactory()
+    task_generator.add_generator(workingtree_generator)
+
+
 def resolve_factory(data_path):
 
     factory = Factory(build_name='git_repository')
@@ -190,37 +202,57 @@ def cache_factory(data_path, unique_name):
     return factory
 
 
-def build_factory(data_path, output_path, git_repository, cache):
+def build_python_factory(build_path, wurfdocs_path, git_repository, cache, config):
 
-    factory = Factory(build_name='task_generator')
+    factory = Factory(build_name='python_generator')
 
-    virtualenv_root_path = os.path.join(data_path, 'virtualenvs')
-
-    factory.provide_value(name='git_binary', value='git')
-    factory.provide_function(name='clone_path', function=provide_clone_path)
-
-    factory.provide_value(name='data_path', value=data_path)
-    factory.provide_value(name='cache', value=cache)
-
-    factory.provide_value(name='output_path', value=output_path)
-    factory.provide_value(name='virtualenv_root_path',
-                          value=virtualenv_root_path)
-    factory.provide_function(name='prompt', function=require_prompt)
-    factory.provide_function(name='git_url_parser',
-                             function=require_git_url_parser)
-    factory.provide_function(name='git', function=require_git)
-    factory.provide_function(name='virtualenv', function=require_virtualenv)
-    factory.provide_function(name='sphinx_environment',
-                             function=require_sphinx_environment)
-    factory.provide_function(name='sphinx_config',
-                             function=require_sphinx_config)
-    factory.provide_function(name='sphinx',
-                             function=require_sphinx)
-
-    factory.provide_value(name='git_repository',
-                          value=git_repository)
-
-    factory.provide_function(name='task_generator',
-                             function=require_task_generator)
+    factory.provide_function(name='python_generator',
+                             function=require_python_generator)
 
     return factory
+
+
+def build_factory(wurfdocs_path, build_path, git_repository, cache, config):
+
+    if config["type"] == "python":
+        return build_python_factory(
+            wurfdocs_path=wurfdocs_path,
+            build_path=build_path, git_repository=git_repository,
+            cache=cache, config=config)
+
+    assert 0
+
+# def build_factory(data_path, output_path, git_repository, cache, config):
+
+#     factory = Factory(build_name='task_generator')
+
+#     virtualenv_root_path = os.path.join(data_path, 'virtualenvs')
+
+#     factory.provide_value(name='git_binary', value='git')
+#     factory.provide_function(name='clone_path', function=provide_clone_path)
+
+#     factory.provide_value(name='data_path', value=data_path)
+#     factory.provide_value(name='cache', value=cache)
+
+#     factory.provide_value(name='output_path', value=output_path)
+#     factory.provide_value(name='virtualenv_root_path',
+#                           value=virtualenv_root_path)
+#     factory.provide_function(name='prompt', function=require_prompt)
+#     factory.provide_function(name='git_url_parser',
+#                              function=require_git_url_parser)
+#     factory.provide_function(name='git', function=require_git)
+#     factory.provide_function(name='virtualenv', function=require_virtualenv)
+#     factory.provide_function(name='sphinx_environment',
+#                              function=require_sphinx_environment)
+#     factory.provide_function(name='sphinx_config',
+#                              function=require_sphinx_config)
+#     factory.provide_function(name='sphinx',
+#                              function=require_sphinx)
+
+#     factory.provide_value(name='git_repository',
+#                           value=git_repository)
+
+#     factory.provide_function(name='task_generator',
+#                              function=require_task_generator)
+
+#     return factory

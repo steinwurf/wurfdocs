@@ -68,3 +68,24 @@ class Prompt(object):
             raise run_error.RunError(result)
 
         return result
+
+
+class PythonPrompt(object):
+
+    def __init__(self, prompt, scripts, cwd, environment):
+        self.prompt = prompt
+        self.cwd = cwd
+        self.environment = environment
+
+    def run(self):
+
+        env = self.environment.create()
+
+        for script in self.scripts:
+            self.prompt.run(command=script)
+
+
+class Variables(object):
+
+    def __init__(self, variables):
+        pass
