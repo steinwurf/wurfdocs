@@ -41,7 +41,7 @@ class Variables(object):
         raise AttributeError("Not found {}".format(key))
 
 
-class PythonEnvironement(object):
+class PythonRequirements(object):
     pass
 
 
