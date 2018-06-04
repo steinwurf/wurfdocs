@@ -7,12 +7,10 @@ import sys
 
 class WorkingtreeTask(object):
 
-    def __init__(self, workingtree_path, output_path, sphinx):
-        self.workingtree_path = workingtree_path
-        self.output_path = output_path
-        self.sphinx = sphinx
+    def __init__(self, command):
+        self.command =
 
-    def run(self, build_info):
+    def run(self):
 
         build_info.output_path = os.path.join(self.output_path, 'workingtree')
         build_info.repository_path = self.workingtree_path
@@ -24,21 +22,20 @@ class WorkingtreeTask(object):
 
 class WorkingtreeGenerator(object):
 
-    def __init__(self, repository, output_path, sphinx):
+    def __init__(self, repository, command):
         self.repository = repository
-        self.output_path = output_path
-        self.sphinx = sphinx
+        self.command = command
 
     def tasks(self):
 
         if self.repository.workingtree_path:
 
-            task = WorkingtreeTask(
-                workingtree_path=self.repository.workingtree_path,
-                output_path=self.output_path,
-                sphinx=self.sphinx)
+            command.set_scope(scope='workingtree')
+            command.set.selector(selector='')
+            command.set_variable(variable='source_path',
+                                 value=self.repository.workingtree_path)
 
-            return [task]
+            return [command]
 
         else:
 
@@ -92,27 +89,21 @@ class GitTask(object):
 
 class GitBranchGenerator(object):
 
-    def __init__(self, repository, output_path,
-                 sphinx, git, cache):
+    def __init__(self, repository, command):
 
         self.repository = repository
-        self.output_path = output_path
-        self.sphinx = sphinx
-        self.git = git
-        self.cache = cache
+        self.command = command
 
     def tasks(self):
 
-        tasks = []
+        branch_name = self.repository.current_branch()
 
-        for branch in self.repository.branches():
-
-            task = GitTask(checkout_type='branch', checkout=branch,
-                           repository_path=self.repository.repository_path,
-                           output_path=self.output_path, sphinx=self.sphinx,
-                           git=self.git, cache=self.cache)
-
-            tasks.append(task)
+        command.set_scope(scope='source_branch')
+        command.set.selector(selector=branch_name)
+        command.set_variable(
+            variable='source_path', value=self.repository.repository_path)
+        command.set_variable(
+            variable='branch_name', value=branch_name)
 
         return tasks
 

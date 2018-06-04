@@ -165,6 +165,17 @@ def require_task_generator(factory):
 
 def require_python_generator(factory):
 
+    config = factory.require(name='config')
+
+    if 'requirements' in config:
+        prompt = factory.require(name='prompt')
+        virtualenv = factory.require(name='virtualenv')
+        environment = PythonEnvironment(
+            prompt=prompt, virtualenv=virtualenv,
+            requirements=config['requirements'])
+    else:
+        environment = SystemEnvironment()
+
     python_prompt = factory.require(name='python_prompt')
 
     workingtree_generator = wurfdocs.tasks.WorkingtreeGenerator(

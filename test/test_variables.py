@@ -41,17 +41,6 @@ class Variables(object):
         raise AttributeError("Not found {}".format(key))
 
 
-class PythonEnvironment(object):
-
-    def __init__(self, prompt, virtualenv, requirements):
-        self.prompt = prompt
-        self.virtualenv = virtualenv
-        self.requirements = requirements
-
-    def create(self):
-        pass
-
-
 class SystemEnvironment(object):
     pass
 
