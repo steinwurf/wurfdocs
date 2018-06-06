@@ -9,6 +9,10 @@ import wurfdocs.factory
 import wurfdocs.build_info
 
 
+def run_python(command, repository, cache, build_path, wurfdocs_path):
+    pass
+
+
 @click.command()
 @click.option('--build_path')
 @click.option('--wurfdocs_path')
@@ -28,24 +32,28 @@ def cli(step, repository, build_path, wurfdocs_path, json_config):
     git_repository = factory.build()
     git_repository.clone(repository=repository)
 
-    # Read the config
-    with open(json_config, 'r') as config_file:
-
-        config = json.load(config_file)
-        step_config = config[step]
-
     # Instantiate the cache
     cache_factory = wurfdocs.factory.cache_factory(
         data_path=wurfdocs_path, unique_name=git_repository.unique_name)
 
     cache = cache_factory.build()
 
-    return
+    # Get the command
+    with open(json_config, 'r') as config_file:
 
-    # Build the documentation
-    factory = wurfdocs.factory.build_factory(
-        wurfdocs_path=wurfdocs_path, build_path=build_path,
-        git_repository=git_repository, cache=cache, config=step_config)
+        config = json.load(config_file)
+        step_config = wurfdocs.config.Config(config=config[step])
+
+    # Run the command
+
+    if step_config['type'] == 'python':
+
+        factory = wurfdocs.factory.build_python_factory(
+            build_path=build_path, wurfdocs_path=wurfdocs_path,
+            git_repository=git_repository, cache=cache,
+            step_config=step_config)
+    else:
+        assert 0
 
     with cache:
 

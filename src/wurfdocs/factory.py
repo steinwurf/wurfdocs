@@ -163,29 +163,6 @@ def require_task_generator(factory):
     return task_generator
 
 
-def require_python_generator(factory):
-
-    config = factory.require(name='config')
-
-    if 'requirements' in config:
-        prompt = factory.require(name='prompt')
-        virtualenv = factory.require(name='virtualenv')
-        environment = PythonEnvironment(
-            prompt=prompt, virtualenv=virtualenv,
-            requirements=config['requirements'])
-    else:
-        environment = SystemEnvironment()
-
-    python_prompt = factory.require(name='python_prompt')
-
-    workingtree_generator = wurfdocs.tasks.WorkingtreeGenerator(
-        repository=git_repository,
-        output_path=output_path, python_prompt=python_prompt)
-
-    task_generator = wurfdocs.tasks.TaskFactory()
-    task_generator.add_generator(workingtree_generator)
-
-
 def resolve_factory(data_path):
 
     factory = Factory(build_name='git_repository')
@@ -213,23 +190,40 @@ def cache_factory(data_path, unique_name):
     return factory
 
 
-def build_python_factory(build_path, wurfdocs_path, git_repository, cache, config):
+def require_python_generator(factory):
+
+    config = factory.require(name='config')
+
+    python_prompt = factory.require(name='python_prompt')
+
+    workingtree_generator = wurfdocs.tasks.WorkingtreeGenerator(
+        repository=git_repository,
+        output_path=output_path, python_prompt=python_prompt)
+
+    task_generator = wurfdocs.tasks.TaskFactory()
+    task_generator.add_generator(workingtree_generator)
+
+
+def build_python_factory(build_path, wurfdocs_path, git_repository,
+                         cache, step_config):
 
     factory = Factory(build_name='python_generator')
 
-    factory.provide_function(name='python_generator',
-                             function=require_python_generator)
+        workingtree_generator = wurfdocs.tasks.WorkingtreeGenerator(
+            repository=git_repository,
+            output_path=output_path, python_prompt=python_prompt)
 
     return factory
 
 
-def build_factory(wurfdocs_path, build_path, git_repository, cache, config):
+def build_factory(wurfdocs_path, build_path, git_repository,
+                  cache, command):
 
-    if config["type"] == "python":
+    if command["type"] == "python":
         return build_python_factory(
             wurfdocs_path=wurfdocs_path,
             build_path=build_path, git_repository=git_repository,
-            cache=cache, config=config)
+            cache=cache, command=command)
 
     assert 0
 

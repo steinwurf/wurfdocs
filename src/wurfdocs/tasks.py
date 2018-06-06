@@ -7,35 +7,35 @@ import sys
 
 class WorkingtreeTask(object):
 
-    def __init__(self, command):
-        self.command =
+    def __init__(self, context, command):
+        self.context = context
+        self.command = command
 
     def run(self):
-
-        build_info.output_path = os.path.join(self.output_path, 'workingtree')
-        build_info.repository_path = self.workingtree_path
-        build_info.slug = 'workingtree'
-        build_info.type = 'workingtree'
-
-        self.sphinx.build(build_info=build_info)
+        self.command.run(context=self.context)
 
 
 class WorkingtreeGenerator(object):
 
-    def __init__(self, repository, command):
+    def __init__(self, repository, command, build_path):
         self.repository = repository
         self.command = command
+        self.build_path = build_path
 
     def tasks(self):
 
         if self.repository.workingtree_path:
 
-            command.set_scope(scope='workingtree')
-            command.set.selector(selector='')
-            command.set_variable(variable='source_path',
-                                 value=self.repository.workingtree_path)
+            context = {
+                'scope': 'workingtree',
+                'name': 'workingtree',
+                'build_path': self.build_path,
+                'source_path': self.repository.workingtree_path
+            }
 
-            return [command]
+            task = WorkingtreeTask(context=context, command=self.command)
+
+            return [task]
 
         else:
 
