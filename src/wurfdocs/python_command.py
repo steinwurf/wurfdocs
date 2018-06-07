@@ -21,13 +21,19 @@ class PythonCommand(object):
 
         self.config.set_context(context=context)
 
-        if 'requirements' in self.config:
+        requirements = self.expand('requirements', False, context)
+
+        if requirements:
             env = self.environment.from_requirements(
-                requirements=self.config.requirements)
+                requirements=self.requirements)
         else:
             env = self.environment.from_system()
 
+        cwd = self.expand('cwd', os.getcwd(), context)
+
         for script in self.config.scripts:
+
+            command = se
 
             try:
                 self.prompt.run(command=script, cwd=self.config.cwd,
@@ -38,6 +44,13 @@ class PythonCommand(object):
                     raise
                 else:
                     self.log.exception('run')
+
+    def expand(element, default, context):
+
+        if element in self.config:
+            return element
+        else:
+            return default
 
 
 class PythonEnvironment(object):
@@ -78,7 +91,41 @@ class PythonEnvironment(object):
         return name
 
 
-class Config(object):
+class PythonConfig(object):
 
     def __init__(self, config):
-        pass
+        self.config = config
+        self.context = None
+
+        # Validate the config
+        assert config['type'] == 'python'
+        assert len(config['scripts']) > 0
+
+        def expand(context, variables):
+            var = wurfdocs.variables.Variables(
+                context=context)
+
+        # Set defaults
+        if 'requirements' not in self.config:
+            self.config['requirement'] = None
+
+        if 'allow_failure' not in self.config:
+            self.config['allow_failure'] = False
+
+        if 'recurse_tags' not in self.config:
+            self.config['recurse_tags'] = False
+
+        if 'variables' not in self.config:
+            self.config['variables'] = None
+
+    def __getattr__(self, attribute):
+        """ Return the value corresponding to the attribute.
+        :param attribute: The name of the attribute to return as a string.
+        :return: The attribute value, if the attribute does not exist
+            return None
+        """
+
+        raise AttributeError("No key {}".format(attribute))
+
+    def set_context(self, context):
+        self.context = context

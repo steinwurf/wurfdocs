@@ -209,9 +209,11 @@ def build_python_factory(build_path, wurfdocs_path, git_repository,
 
     factory = Factory(build_name='python_generator')
 
-        workingtree_generator = wurfdocs.tasks.WorkingtreeGenerator(
-            repository=git_repository,
-            output_path=output_path, python_prompt=python_prompt)
+    factory.provide_value()
+
+    workingtree_generator = wurfdocs.tasks.WorkingtreeGenerator(
+        repository=git_repository,
+        output_path=output_path, python_prompt=python_prompt)
 
     return factory
 

@@ -38,6 +38,7 @@ def cli(step, repository, build_path, wurfdocs_path, json_config):
 
     cache = cache_factory.build()
 
+    return
     # Get the command
     with open(json_config, 'r') as config_file:
 
