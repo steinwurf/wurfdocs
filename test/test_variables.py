@@ -102,7 +102,7 @@ class PythonConfig(object):
         return self.config[attribute]
 
 
-class ConfigContext(object):
+class ConfigReader(object):
 
     def __init__(self, config, context):
         self.config = config

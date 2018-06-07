@@ -19,19 +19,15 @@ class PythonCommand(object):
 
     def run(self, context):
 
-        self.config.set_context(context=context)
+        reader = ConfigReader(config=config, context=context)
 
-        requirements = self.expand('requirements', False, context)
-
-        if requirements:
+        if reader.requirements:
             env = self.environment.from_requirements(
                 requirements=self.requirements)
         else:
             env = self.environment.from_system()
 
-        cwd = self.expand('cwd', os.getcwd(), context)
-
-        for script in self.config.scripts:
+        for script in reader.scripts:
 
             command = se
 
