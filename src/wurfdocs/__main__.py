@@ -38,23 +38,22 @@ def cli(step, repository, build_path, wurfdocs_path, json_config):
 
     cache = cache_factory.build()
 
-    return
     # Get the command
     with open(json_config, 'r') as config_file:
-
         config = json.load(config_file)
-        step_config = wurfdocs.config.Config(config=config[step])
 
     # Run the command
 
-    if step_config['type'] == 'python':
+    if config[step]['type'] == 'python':
 
         factory = wurfdocs.factory.build_python_factory(
             build_path=build_path, wurfdocs_path=wurfdocs_path,
             git_repository=git_repository, cache=cache,
-            step_config=step_config)
+            config=config[step])
     else:
         assert 0
+
+    return
 
     with cache:
 

@@ -136,29 +136,29 @@ def require_cache(factory):
 
 def require_task_generator(factory):
 
-    output_path = factory.require(name='output_path')
     git_repository = factory.require(name='git_repository')
-    sphinx = factory.require(name='sphinx')
-    git = factory.require(name='git')
-    cache = factory.require(name='cache')
+    command = factory.require(name='command')
+    build_path = factory.require(name='build_path')
+    # git = factory.require(name='git')
+    # cache = factory.require(name='cache')
 
     workingtree_generator = wurfdocs.tasks.WorkingtreeGenerator(
-        repository=git_repository,
-        output_path=output_path, sphinx=sphinx)
+        git_repository=git_repository,
+        command=command, build_path=build_path)
 
-    git_branch_generator = wurfdocs.tasks.GitBranchGenerator(
-        repository=git_repository,
-        output_path=output_path, sphinx=sphinx, git=git, cache=cache)
+    # git_branch_generator = wurfdocs.tasks.GitBranchGenerator(
+    #     repository=git_repository,
+    #     output_path=output_path, sphinx=sphinx, git=git, cache=cache)
 
-    git_tag_generator = wurfdocs.tasks.GitTagGenerator(
-        repository=git_repository,
-        output_path=output_path, sphinx=sphinx, git=git, cache=cache)
+    # git_tag_generator = wurfdocs.tasks.GitTagGenerator(
+    #     repository=git_repository,
+    #     output_path=output_path, sphinx=sphinx, git=git, cache=cache)
 
     task_generator = wurfdocs.tasks.TaskFactory()
 
     task_generator.add_generator(workingtree_generator)
-    task_generator.add_generator(git_branch_generator)
-    task_generator.add_generator(git_tag_generator)
+    # task_generator.add_generator(git_branch_generator)
+    # task_generator.add_generator(git_tag_generator)
 
     return task_generator
 
@@ -190,30 +190,57 @@ def cache_factory(data_path, unique_name):
     return factory
 
 
-def require_python_generator(factory):
+def require_python_config(factory):
 
     config = factory.require(name='config')
+    return wurfdocs.python_config.PythonConfig.from_dict(config=config)
 
-    python_prompt = factory.require(name='python_prompt')
 
-    workingtree_generator = wurfdocs.tasks.WorkingtreeGenerator(
-        repository=git_repository,
-        output_path=output_path, python_prompt=python_prompt)
+def require_python_environement(factory):
 
-    task_generator = wurfdocs.tasks.TaskFactory()
-    task_generator.add_generator(workingtree_generator)
+    prompt = factory.require(name='prompt')
+    virtualenv = factory.require(name='virtualenv')
+
+    return wurfdocs.python_environment.PythonEnvironment(
+        prompt=prompt, virtualenv=virtualenv)
+
+
+def require_python_command(factory):
+
+    config = factory.require(name='python_config')
+    environment = factory.require(name='python_environment')
+    prompt = factory.require(name='prompt')
+    log = logging.getLogger(name='wurfdocs.python_command')
+
+    return wurfdocs.python_command.PythonCommand(
+        config=config, environment=environment, prompt=prompt, log=log)
 
 
 def build_python_factory(build_path, wurfdocs_path, git_repository,
                          cache, step_config):
 
-    factory = Factory(build_name='python_generator')
+    factory = Factory(build_name='require_task_generator')
 
-    factory.provide_value()
+    factory.provide_value(
+        name='config', value=step_config)
 
-    workingtree_generator = wurfdocs.tasks.WorkingtreeGenerator(
-        repository=git_repository,
-        output_path=output_path, python_prompt=python_prompt)
+    factory.provide_value(
+        name='build_path', value=build_path)
+
+    factory.provide_value(
+        name='git_repository', value=git_repository)
+
+    factory.provide_function(
+        name='python_config', function=require_python_config)
+
+    factory.provide_function(
+        name='python_environment', function=require_python_environement)
+
+    factory.provide_function(
+        name='command', function=require_python_command)
+
+    factory.provide_function(
+        name='require_task_generator', function=require_task_generator)
 
     return factory
 

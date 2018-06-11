@@ -17,20 +17,20 @@ class WorkingtreeTask(object):
 
 class WorkingtreeGenerator(object):
 
-    def __init__(self, repository, command, build_path):
-        self.repository = repository
+    def __init__(self, git_repository, command, build_path):
+        self.git_repository = git_repository
         self.command = command
         self.build_path = build_path
 
     def tasks(self):
 
-        if self.repository.workingtree_path:
+        if self.git_repository.workingtree_path:
 
             context = {
                 'scope': 'workingtree',
                 'name': 'workingtree',
                 'build_path': self.build_path,
-                'source_path': self.repository.workingtree_path
+                'source_path': self.git_repository.workingtree_path
             }
 
             task = WorkingtreeTask(context=context, command=self.command)
