@@ -17,6 +17,7 @@ import wurfdocs.virtualenv
 import wurfdocs.sphinx_environment
 import wurfdocs.sphinx
 import wurfdocs.tasks
+import wurfdocs.python_config
 
 
 class Factory(object):
@@ -217,12 +218,12 @@ def require_python_command(factory):
 
 
 def build_python_factory(build_path, wurfdocs_path, git_repository,
-                         cache, step_config):
+                         cache, config):
 
     factory = Factory(build_name='require_task_generator')
 
     factory.provide_value(
-        name='config', value=step_config)
+        name='config', value=config)
 
     factory.provide_value(
         name='build_path', value=build_path)
@@ -234,10 +235,28 @@ def build_python_factory(build_path, wurfdocs_path, git_repository,
         name='python_config', function=require_python_config)
 
     factory.provide_function(
+        name='prompt', function=require_prompt)
+
+    factory.provide_function(
         name='python_environment', function=require_python_environement)
 
     factory.provide_function(
         name='command', function=require_python_command)
+
+    factory.provide_value(name='output_path', value=wurfdocs_path)
+    factory.provide_function(name='clone_path', function=provide_clone_path)
+
+    virtualenv_root_path = os.path.join(wurfdocs_path, 'virtualenvs')
+    factory.provide_value(name='virtualenv_root_path',
+                          value=virtualenv_root_path)
+
+    factory.provide_value(name='git_binary', value='git')
+
+    factory.provide_function(name='git_url_parser',
+                             function=require_git_url_parser)
+    factory.provide_function(name='git', function=require_git)
+
+    factory.provide_function(name='virtualenv', function=require_virtualenv)
 
     factory.provide_function(
         name='require_task_generator', function=require_task_generator)

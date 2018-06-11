@@ -53,8 +53,6 @@ def cli(step, repository, build_path, wurfdocs_path, json_config):
     else:
         assert 0
 
-    return
-
     with cache:
 
         task_generator = factory.build()
@@ -64,8 +62,7 @@ def cli(step, repository, build_path, wurfdocs_path, json_config):
         for task in tasks:
 
             try:
-                build_info = wurfdocs.build_info.BuildInfo()
-                task.run(build_info=build_info)
+                task.run()
 
             except RuntimeError as re:
                 log.debug(re)
