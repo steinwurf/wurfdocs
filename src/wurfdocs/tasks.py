@@ -44,91 +44,90 @@ class WorkingtreeGenerator(object):
 
 class GitTask(object):
 
-    def __init__(self, checkout_type, checkout, repository_path, output_path,
-                 sphinx, git, cache):
-
-        self.checkout_type = checkout_type
-        self.checkout = checkout
-        self.repository_path = repository_path
-        self.output_path = output_path
-        self.sphinx = sphinx
+    def __init__(self, git, context, command):
         self.git = git
-        self.cache = cache
+        self.context = context
+        self.command = command
 
-    def run(self, build_info):
+    def run(self):
 
-        cwd = self.repository_path
+        cwd = self.context['source_path']
+        checkout = self.context['name']
 
         # https://stackoverflow.com/a/8888015/1717320
-        self.git.reset(branch=self.checkout, hard=True, cwd=cwd)
+        self.git.reset(branch=checkout, hard=True, cwd=cwd)
 
-        output_path = os.path.join(
-            self.output_path, self.checkout_type, self.checkout)
+        self.command.run(context=self.context)
 
-        sha1 = self.git.current_commit(cwd=cwd)
+        # output_path = os.path.join(
+        #     self.output_path, self.checkout_type, self.checkout)
 
-        build_info.output_path = output_path
-        build_info.repository_path = self.repository_path
-        build_info.slug = self.checkout
-        build_info.type = self.checkout_type
+        # sha1 = self.git.current_commit(cwd=cwd)
 
-        if self.cache.match(sha1=sha1):
-            path = self.cache.path(sha1=sha1)
+        # build_info.output_path = output_path
+        # build_info.repository_path = self.repository_path
+        # build_info.slug = self.checkout
+        # build_info.type = self.checkout_type
 
-            if path != output_path:
-                shutil.copytree(src=path, dst=output_path)
+        # if self.cache.match(sha1=sha1):
+        #     path = self.cache.path(sha1=sha1)
 
-        else:
+        #     if path != output_path:
+        #         shutil.copytree(src=path, dst=output_path)
 
-            self.sphinx.build(build_info=build_info)
+        # else:
 
-            self.cache.update(sha1=sha1, path=output_path)
+        #     self.sphinx.build(build_info=build_info)
 
-        return build_info
+        #     self.cache.update(sha1=sha1, path=output_path)
 
 
 class GitBranchGenerator(object):
 
-    def __init__(self, repository, command):
+    def __init__(self, git, git_repository, command, build_path):
 
-        self.repository = repository
+        self.git = git
+        self.git_repository = git_repository
         self.command = command
+        self.build_path = build_path
 
     def tasks(self):
 
-        branch_name = self.repository.current_branch()
+        context = {
+            'scope': 'source_branch',
+            'name': self.git_repository.source_branch,
+            'build_path': self.build_path,
+            'source_path': self.git_repository.repository_path
+        }
 
-        command.set_scope(scope='source_branch')
-        command.set.selector(selector=branch_name)
-        command.set_variable(
-            variable='source_path', value=self.repository.repository_path)
-        command.set_variable(
-            variable='branch_name', value=branch_name)
+        task = GitTask(git=self.git, context=context, command=self.command)
 
-        return tasks
+        return [task]
 
 
 class GitTagGenerator(object):
 
-    def __init__(self, repository, output_path,
-                 sphinx, git, cache):
+    def __init__(self, git, git_repository, command, build_path):
 
-        self.repository = repository
-        self.output_path = output_path
-        self.sphinx = sphinx
         self.git = git
-        self.cache = cache
+        self.git_repository = git_repository
+        self.command = command
+        self.build_path = build_path
 
     def tasks(self):
 
         tasks = []
 
-        for tag in self.repository.tags():
+        for tag in self.git_repository.tags():
 
-            task = GitTask(checkout_type='tag', checkout=tag,
-                           repository_path=self.repository.repository_path,
-                           output_path=self.output_path, sphinx=self.sphinx,
-                           git=self.git, cache=self.cache)
+            context = {
+                'scope': 'tag',
+                'name': tag,
+                'build_path': self.build_path,
+                'source_path': self.git_repository.repository_path
+            }
+
+            task = GitTask(git=self.git, context=context, command=self.command)
 
             tasks.append(task)
 

@@ -1,17 +1,23 @@
 #! /usr/bin/env python
 # encoding: utf-8
+import sys
+import hashlib
+import os
 
 
 class PythonEnvironment(object):
 
-    def __init__(self, prompt, virtualenv):
+    def __init__(self, prompt, virtualenv, log):
         self.prompt = prompt
         self.virtualenv = virtualenv
+        self.log = log
 
     def from_requirements(self, requirements):
 
         name = self._environment_name(requirements=requirements)
         env = self.virtualenv.create_environment(name=name)
+
+        self.log.debug("pip install %s", requirements)
 
         # Install the requirements
         command = 'python -m pip install -r {}'.format(requirements)

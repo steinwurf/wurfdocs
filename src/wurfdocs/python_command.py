@@ -21,6 +21,8 @@ class PythonCommand(object):
 
     def run(self, context):
 
+        self.log.debug("RUN context=%s", context)
+
         reader = wurfdocs.config_reader.ConfigReader(
             config=self.config, context=context)
 

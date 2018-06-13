@@ -4,7 +4,7 @@ import hashlib
 
 class GitRepository(object):
 
-    def __init__(self, git, git_url_parser, clone_path, log):
+    def __init__(self, git, git_url_parser, clone_path, source_branch, log):
         self.git = git
         self.git_url_parser = git_url_parser
         self.log = log
@@ -23,6 +23,9 @@ class GitRepository(object):
         # A unique name computed based on the git URL
         self.unique_name = None
 
+        # The branch which should be the source branch
+        self.source_branch = source_branch
+
     def clone(self, repository):
 
         assert repository
@@ -37,8 +40,17 @@ class GitRepository(object):
         if os.path.isdir(repository):
             self.workingtree_path = repository
             git_url = self.git.remote_origin_url(cwd=repository)
+
+            if not self.source_branch:
+                # If we don't have a source branch we use the one which is
+                # currently checked out in the working tree
+                self.source_branch, _ = self.git.branch(cwd=repository)
         else:
             git_url = repository
+
+            if not self.source_branch:
+                # If we don't have a source branch we use 'master
+                self.source_branch = 'master'
 
         # Compute the clone path
         git_info = self.git_url_parser.parse(url=git_url)
@@ -50,7 +62,7 @@ class GitRepository(object):
 
         # Get the updates
         if os.path.isdir(self.repository_path):
-            self.git.fetch(cwd=self.repository_path)
+            self.git.fetch(cwd=self.repository_path, all=True)
         else:
             self.git.clone(repository=git_url,
                            directory=self.repository_path, cwd=self.clone_path)

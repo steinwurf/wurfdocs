@@ -41,7 +41,7 @@ class Prompt(object):
         if 'cwd' not in kwargs:
             kwargs['cwd'] = self.cwd
 
-        self.log.debug(command)
+        self.log.debug("command=%s, cwd=%s", command, self.cwd)
 
         start_time = time.time()
 
@@ -62,30 +62,9 @@ class Prompt(object):
         result = run_result.RunResult(
             command=command, path=kwargs['cwd'],
             stdout=stdout, stderr=stderr, returncode=popen.returncode,
-            time=end_time - start_time)
+            time=end_time - start_time, env=kwargs['env'])
 
         if popen.returncode != 0:
             raise run_error.RunError(result)
 
         return result
-
-
-class PythonPrompt(object):
-
-    def __init__(self, prompt, scripts, cwd, environment):
-        self.prompt = prompt
-        self.cwd = cwd
-        self.environment = environment
-
-    def run(self):
-
-        env = self.environment.create()
-
-        for script in self.scripts:
-            self.prompt.run(command=script)
-
-
-class Variables(object):
-
-    def __init__(self, variables):
-        pass

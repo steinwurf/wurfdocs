@@ -1,8 +1,8 @@
-import wurfdocs
-import wurfdocs.commandline as cli
+
+import wurfdocs.prompt
 
 
 def test_run(testdirectory):
 
-    prompt = cli.Prompt()
+    prompt = wurfdocs.prompt.Prompt()
     prompt.run('python --version', cwd=testdirectory.path())

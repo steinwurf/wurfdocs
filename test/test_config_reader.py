@@ -38,3 +38,6 @@ def test_config_reader():
     assert reader.scripts[0] == 'python test.py yuyu hip hap /tmp/build'
     assert reader.cwd == '/tmp/clone'
     assert reader.allow_failure == True
+
+    for script in reader.scripts:
+        assert script == 'python test.py yuyu hip hap /tmp/build'

@@ -91,20 +91,3 @@ class NameToPathAdapter(object):
         path = os.path.join(self.virtualenv_root_path, name)
 
         return self.virtualenv.create_environment(path=path)
-
-
-def build(application_info):
-
-    # Build the needed objects
-    git = wurfdocs.git.build()
-    log = logging.getLogger(__name__)
-
-    # Extract the needed paths
-    clone_path = application_info.clone_path
-    virtualenv_root_path = application_info.virtualenv_root_path
-
-    venv = VirtualEnv.from_git(git=git, clone_path=clone_path, log=log)
-    venv = NameToPathAdapter(
-        virtualenv=venv, virtualenv_root_path=virtualenv_root_path)
-
-    return venv

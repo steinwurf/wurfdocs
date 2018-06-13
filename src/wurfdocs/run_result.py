@@ -5,7 +5,8 @@ path:\n{}
 stdout:\n{}
 stderr:\n{}
 returncode:\n{}
-time:\n{}"""
+time:\n{}
+env:\n{}"""
 
 
 class RunResult:
@@ -19,7 +20,7 @@ class RunResult:
     :time: The time it took to execute the command
     """
 
-    def __init__(self, command, path, stdout, stderr, returncode, time):
+    def __init__(self, command, path, stdout, stderr, returncode, time, env):
         """ Create a new RunResult object
         """
 
@@ -29,9 +30,11 @@ class RunResult:
         self.stderr = stderr
         self.returncode = returncode
         self.time = time
+        self.env = env
 
     def __str__(self):
         """ Print the RunResult object as a string
         """
         return run_string.format(self.command, self.path, self.stdout,
-                                 self.stderr, self.returncode, self.time)
+                                 self.stderr, self.returncode, self.time,
+                                 self.env)

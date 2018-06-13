@@ -9,7 +9,16 @@ def test_build(testdirectory):
     cmd = ['wurfdocs', 'sphinx', url,
            '--build_path', build_dir.path(),
            '--wurfdocs_path', wurfdocs_dir.path(),
-           '--json_config', config_file]
+           '--json_config', config_file,
+           '--source_branch', 'origin/add-docs']
+
+    r = testdirectory.run(cmd)
+
+    cmd = ['wurfdocs', 'landing_page', url,
+           '--build_path', build_dir.path(),
+           '--wurfdocs_path', wurfdocs_dir.path(),
+           '--json_config', config_file,
+           '--source_branch', 'origin/add-docs']
 
     r = testdirectory.run(cmd)
 

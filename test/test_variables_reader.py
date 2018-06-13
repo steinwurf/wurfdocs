@@ -1,4 +1,6 @@
 import mock
+import pytest
+
 import wurfdocs.variables_reader
 
 
@@ -25,3 +27,26 @@ def test_variables():
 
     r = v.expand(element='$out likes')
     assert r == 'yuyu hip hap /tmp/build likes'
+
+
+def test_variables_not_found():
+
+    variables = {
+        'source_branch:master:out': 'yoyo',
+        'source_branch:out': 'yiyi',
+        'tag:out': 'yuyu ${boing} ${build_path}',
+        'tag:boo': 'hap'
+    }
+
+    context = {
+        'scope': 'tag',
+        'name': '1.0.0',
+        'build_path': '/tmp/build',
+        'source_path': '/tmp/clone'
+    }
+
+    v = wurfdocs.variables_reader.VariablesReader(
+        variables=variables, context=context)
+
+    with pytest.raises(AttributeError):
+        r = v.expand(element='$out likes')

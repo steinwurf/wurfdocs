@@ -1,5 +1,6 @@
 import wurfdocs.python_config
 import wurfdocs.variables_reader
+import wurfdocs.compat
 
 
 class ConfigReader(object):
@@ -25,10 +26,10 @@ class ConfigReader(object):
 
     def _expand(self, element):
 
-        if type(element) == str:
+        if isinstance(element, wurfdocs.compat.string_type):
             return self.variables.expand(element=element)
 
-        if type(element) == list:
+        if isinstance(element, list):
 
             values = []
             for e in element:

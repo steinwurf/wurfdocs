@@ -70,7 +70,7 @@ class Git(object):
 
         self.prompt.run(args, cwd=cwd)
 
-    def branch(self, cwd, remote):
+    def branch(self, cwd, remote=False):
         """
         Runs 'git branch' and returns the current branch and a list of
         additional branches
