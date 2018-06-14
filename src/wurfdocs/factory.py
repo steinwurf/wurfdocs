@@ -35,9 +35,12 @@ class Factory(object):
 
         self.providers[name] = call
 
-    def provide_function(self, name, function):
+    def provide_function(self, name, function, override=False):
 
-        assert name not in self.providers
+        if override:
+            assert name in self.providers
+        else:
+            assert name not in self.providers
 
         def call():
             return function(self)
@@ -127,15 +130,18 @@ def require_task_generator(factory):
         git=git, git_repository=git_repository,
         command=command, build_path=build_path)
 
-    git_tag_generator = wurfdocs.tasks.GitTagGenerator(
-        git=git, git_repository=git_repository,
-        command=command, build_path=build_path)
-
     task_generator = wurfdocs.tasks.TaskFactory()
 
     task_generator.add_generator(workingtree_generator)
     task_generator.add_generator(git_branch_generator)
-    task_generator.add_generator(git_tag_generator)
+
+    if command.config.recurse_tags:
+
+        git_tag_generator = wurfdocs.tasks.GitTagGenerator(
+            git=git, git_repository=git_repository,
+            command=command, build_path=build_path)
+
+        task_generator.add_generator(git_tag_generator)
 
     return task_generator
 
@@ -172,7 +178,8 @@ def cache_factory(data_path, unique_name):
 def require_python_config(factory):
 
     config = factory.require(name='config')
-    return wurfdocs.python_config.PythonConfig.from_dict(config=config)
+    return wurfdocs.python_config.PythonConfig.from_dict(
+        config=config)
 
 
 def require_python_environement(factory):

@@ -47,6 +47,11 @@ def options(opt):
         '--pytest_basetemp', default='pytest_temp',
         help='Set the prefix folder where pytest executes the tests')
 
+    opt.add_option(
+        '--test_filter', default=None, action='store',
+        help='Runs all tests that include the substring specified.'
+             'Wildcards not allowed. (Used with --run_tests)')
+
 
 def configure(conf):
     pass
@@ -135,6 +140,10 @@ def _pytest(bld):
         command = 'python -B -m pytest {} --basetemp {}'.format(
             testdir.abspath(), os.path.join(basetemp, 'unit_tests'))
 
+        # Adds the test filter if specified
+        if bld.options.test_filter:
+            command += ' -k "{}"'.format(bld.options.test_filter)
+
         # Make python not write any .pyc files. These may linger around
         # in the file system and make some tests pass although their .py
         # counter-part has been e.g. deleted
@@ -142,11 +151,11 @@ def _pytest(bld):
 
         # Check readme
         # https://stackoverflow.com/a/49107899/1717320
-        #venv.run(cmd='python setup.py check -r -s', cwd=bld.path)
+        # venv.run(cmd='python setup.py check -r -s', cwd=bld.path)
 
-        # 
-        #venv.pip_install(['collective.checkdocs'])
-        #venv.run(cmd='python setup.py checkdocs', cwd=bld.path)
+        #
+        # venv.pip_install(['collective.checkdocs'])
+        # venv.run(cmd='python setup.py checkdocs', cwd=bld.path)
 
 
 def _create_virtualenv(bld):

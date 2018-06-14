@@ -1,12 +1,11 @@
 {
-    "sphinx": {
+    "docs": {
         "type": "python",
         "scripts": [
-            "sphinx-build -b html . ${output_path}"
+            "python scripts.py --out ${output_path}"
         ],
-        "requirements": "${source_path}/docs/requirements.txt",
         "cwd": "${source_path}/docs",
-        "allow_failure": true,
+        "requirements": "${source_path}/docs/requirements.txt",
         "recurse_tags": true,
         "variables": {
             "source_branch:master:output_path": "${build_path}/docs/latest",
@@ -18,25 +17,14 @@
     "landing_page": {
         "type": "python",
         "scripts": [
-            "python generate.py --docspath=${build_path}/docs --outpath=${output_path}"
+            "python scripts.py --out ${output_path}"
         ],
-        "requirements": "${source_path}/landing_page/requirements.txt",
         "cwd": "${source_path}/landing_page",
-        "allow_failure": true,
+        "requirements": "${source_path}/landing_page/requirements.txt",
         "variables": {
-            "source_branch:master:output_path": "${build_path}",
+            "source_branch:master:output_path": "${build_path}/docs",
             "source_branch:output_path": "${build_path}/landing_page/experiments/${name}",
             "workingtree:output_path": "${build_path}/landing_page/experiments/workingtree"
         }
-    },
-    "publish": {
-        "type": "push",
-        "remote_branch": "gh_pages",
-        "exclude_paths": [
-            "{build_path}/landing_page/experiments/workingtree",
-            "{build_path}/sphinx/experiments/workingtree"
-        ],
-        "remote_path": ".",
-        "source_path": "${build_path}"
     }
 }

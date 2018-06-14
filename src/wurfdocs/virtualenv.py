@@ -7,8 +7,8 @@ import hashlib
 import shutil
 import logging
 
-import wurfdocs.git
-from . import commandline
+import prompt
+
 
 URL = 'https://github.com/pypa/virtualenv.git'
 VERSION = '15.1.0'
@@ -75,9 +75,9 @@ class VirtualEnv(object):
         env = dict(os.environ)
         env.update({'PYTHONPATH': repo_path})
 
-        prompt = commandline.Prompt(env=env)
+        p = prompt.Prompt(env=env)
 
-        return VirtualEnv(prompt=prompt, log=log)
+        return VirtualEnv(prompt=p, log=log)
 
 
 class NameToPathAdapter(object):

@@ -4,8 +4,6 @@
 import os
 import re
 
-import wurfdocs.commandline
-
 
 class Git(object):
 
@@ -223,10 +221,3 @@ class Git(object):
         result = self.prompt.run(args, cwd=cwd)
 
         return result.stdout.strip()
-
-
-def build():
-    """ Builds and returns a new Git object """
-
-    return Git(git_binary='git',
-               prompt=wurfdocs.commandline.Prompt())

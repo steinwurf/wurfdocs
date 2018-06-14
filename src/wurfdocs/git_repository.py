@@ -4,15 +4,27 @@ import hashlib
 
 class GitRepository(object):
 
-    def __init__(self, git, git_url_parser, clone_path, source_branch, log):
+    def __init__(self, git, git_url_parser, clone_path,
+                 source_branch, log):
+        """ Create a new instance.
+
+        :param git: The Git object used to run git commands.
+        :param git_url_parser: Parser to extract information from
+            the git URL
+        :param clone_path: The user specified where clones should
+            be made
+        :param source_branch: An optional source branch. If specified
+            this branch will be used as the source_branch otherwise
+            we either the current branch or master.
+        :param log: A logging object
+        """
         self.git = git
         self.git_url_parser = git_url_parser
-        self.log = log
         self.clone_path = clone_path
+        self.source_branch = source_branch
+        self.log = log
 
-        self.git_info = None
-
-        self.git_url = None
+        # The following attributes are specified after cloning:
 
         # Path to the local working tree (if one exists)
         self.workingtree_path = None
@@ -23,10 +35,12 @@ class GitRepository(object):
         # A unique name computed based on the git URL
         self.unique_name = None
 
-        # The branch which should be the source branch
-        self.source_branch = source_branch
-
     def clone(self, repository):
+        """ Clones the repository.
+
+        :param repository: The repository can either be an URL
+            or a path to an existing repository
+        """
 
         assert repository
 
@@ -68,12 +82,5 @@ class GitRepository(object):
                            directory=self.repository_path, cwd=self.clone_path)
 
     def tags(self):
+        """ :return: THe tags specified for the repository """
         return self.git.tags(cwd=self.repository_path)
-
-    def branches(self):
-        _, remote = self.git.branch(cwd=self.repository_path, remote=True)
-
-        # Remote branches look like origin/master, origin/some_branch etc.
-        # We flatten this.
-
-        return remote

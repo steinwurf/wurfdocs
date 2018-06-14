@@ -41,7 +41,7 @@ class Prompt(object):
         if 'cwd' not in kwargs:
             kwargs['cwd'] = self.cwd
 
-        self.log.debug("command=%s, cwd=%s", command, self.cwd)
+        self.log.debug("command=%s, cwd=%s", command, kwargs['cwd'])
 
         start_time = time.time()
 
