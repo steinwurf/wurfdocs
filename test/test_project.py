@@ -7,6 +7,7 @@ import wurfdocs.git
 
 
 class FakeGit(wurfdocs.git.Git):
+    """ This object replaces git implementation for testing """
 
     def __init__(self, directory, **kwargs):
 
@@ -24,6 +25,7 @@ class FakeGit(wurfdocs.git.Git):
 
 
 def require_fake_git(factory):
+    """ Function to build the FakeGit object """
 
     prompt = factory.require(name='prompt')
     git_binary = factory.require(name='git_binary')
@@ -87,19 +89,8 @@ def test_project(testdirectory, caplog):
 
     build.run()
 
-    assert 0
-
-    # cmd = ['wurfdocs', 'docs', project_dir.path(),
-    #        '--build_path', build_dir.path(),
-    #        '--wurfdocs_path', wurfdocs_dir.path(),
-    #        '--source_branch', 'origin/add-docs']
-
-    # testdirectory.run(cmd)
-
-    # cmd = ['wurfdocs', 'landing_page', url,
-    #        '--build_path', build_dir.path(),
-    #        '--wurfdocs_path', wurfdocs_dir.path(),
-    #        '--json_config', config_file,
-    #        '--source_branch', 'origin/add-docs']
-
-    # testdirectory.run(cmd)
+    assert build_dir.contains_file(filename='docs/landing.txt')
+    assert build_dir.contains_file(filename='docs/3.1.2/docs.txt')
+    assert build_dir.contains_file(filename='docs/3.2.0/docs.txt')
+    assert build_dir.contains_file(filename='docs/3.3.0/docs.txt')
+    assert build_dir.contains_file(filename='docs/3.3.1/docs.txt')

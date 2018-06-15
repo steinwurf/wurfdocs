@@ -35,12 +35,10 @@ class PythonCommand(object):
         for script in reader.scripts:
 
             try:
-                self.log.debug("Before RUN")
 
                 self.prompt.run(command=script, cwd=reader.cwd,
                                 env=env)
 
-                self.log.debug("AFTER RUN")
             except Exception:
 
                 if not reader.allow_failure:
