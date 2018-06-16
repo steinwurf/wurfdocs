@@ -52,7 +52,46 @@ class FileTransfer(object):
         self.sftp = sftp
 
     def transfer(self):
-        pass
+
+    def transfer_file(self, source_file, remote_file):
+        remote_path, remote_file = self._path_split(remote_file=remote_file)
+
+        for path in remote_path:
+
+            try:
+                sftp.chdir(path=path)
+            except:
+                sftp.mkdir(path=path)
+                sftp.chdir(path=path)
+
+        sftp.put(localpath=source_file, remotepath=remote_file)
+
+    @staticmethod
+    def _path_split(remote_file):
+
+        assert remote_file.startswith('/'), "must be absolute %s" % remote_file
+
+        path = remote_file
+        path_split = []
+
+        while True:
+            path, leaf = os.path.split(path)
+            if leaf:
+                # Adds one element, at the beginning of the list
+                path_split = [leaf] + path_split
+            else:
+                path_split = [path] + path_split
+                break
+
+        return path_split[:-1], path_split[-1]
+
+
+def test_filetransfer_path_split():
+
+    path, filename = FileTransfer._path_split(remote_file='/www/var/file.txt')
+
+    assert path == ['/', 'www', 'var']
+    assert filename == 'file.txt'
 
 
 def test_filelist(testdirectory):
