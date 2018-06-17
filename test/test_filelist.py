@@ -3,6 +3,7 @@
 
 import os
 import fnmatch
+import paramiko
 
 
 class FileInfo(object):
@@ -14,10 +15,10 @@ class FileInfo(object):
 
 class FileList(object):
 
-    def __init__(self, source_path, remote_path, exclude_paths=[]):
+    def __init__(self, source_path, remote_path, exclude_patterns=[]):
         self.source_path = source_path
         self.remote_path = remote_path
-        self.exclude_paths = exclude_paths
+        self.exclude_patterns = exclude_patterns
 
     def __iter__(self):
         for root, dirs, files in os.walk(self.source_path, topdown=True):
@@ -25,7 +26,7 @@ class FileList(object):
             for f in files:
                 source_file = os.path.join(root, f)
 
-                if not self._exclude(source_file, self.exclude_paths):
+                if not self._exclude(filename=source_file):
 
                     relative_path = os.path.relpath(
                         source_file, self.source_path)
@@ -35,9 +36,9 @@ class FileList(object):
                     yield FileInfo(source_file=source_file,
                                    remote_file=remote_file)
 
-    def _exclude(self, filename, exclude_paths):
+    def _exclude(self, filename):
 
-        for e in exclude_paths:
+        for e in self.exclude_patterns:
 
             if fnmatch.fnmatch(filename, e):
                 return True
@@ -47,11 +48,21 @@ class FileList(object):
 
 class FileTransfer(object):
 
-    def __init__(self, filelist, sftp):
-        self.filelist = filelist
-        self.sftp = sftp
+    def __init__(self, ssh):
+        self.ssh = ssh
 
-    def transfer(self):
+    def connect(self, username, hostname):
+        self.ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        self.ssh_.connect(hostname=hostname,
+                          username=username)
+
+    def transfer(self, filelist):
+
+        sftp_client = self.ssh_client.open_sftp()
+
+        for fileinfo in filelist:
+            self.transfer_file(source_file=fileinfo.source_file,
+                               remote_file=fileinfo.remote_file)
 
     def transfer_file(self, source_file, remote_file):
         remote_path, remote_file = self._path_split(remote_file=remote_file)
@@ -59,12 +70,13 @@ class FileTransfer(object):
         for path in remote_path:
 
             try:
-                sftp.chdir(path=path)
-            except:
-                sftp.mkdir(path=path)
-                sftp.chdir(path=path)
+                # http://docs.paramiko.org/en/2.4/api/sftp.html
+                self.sftp.chdir(path=path)
+            except IOError:
+                self.sftp.mkdir(path=path)
+                self.sftp.chdir(path=path)
 
-        sftp.put(localpath=source_file, remotepath=remote_file)
+        self.sftp.put(localpath=source_file, remotepath=remote_file)
 
     @staticmethod
     def _path_split(remote_file):
@@ -84,6 +96,52 @@ class FileTransfer(object):
                 break
 
         return path_split[:-1], path_split[-1]
+
+
+class SFTP(object):
+
+    def __init__(self, ssh_client):
+        self.ssh_client = ssh_client
+
+    def connect(self, username, hostname):
+        self.ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        self.ssh_client.connect(hostname=hostname,
+                                username=username)
+
+    def transfer(self, source_path, remote_path, exclude_patterns):
+
+        sftp_client = self.ssh_client.open_sftp()
+
+        filelist = FileList(source_path=source_path,
+                            remote_path=remote_path,
+                            exclude_patterns=exclude_patterns)
+
+        filetransfer = FileTransfer(filelist=filelist, sftp=sftp_client)
+        filetransfer.transfer()
+
+        sftp_client.close()
+
+
+def test_filetransfer(testdirectory):
+
+    a_dir = testdirectory.mkdir('a')
+
+    a_dir.write_text(filename='helloworld.txt',
+                     data=u'hello', encoding='utf-8')
+    b_dir = a_dir.mkdir('b')
+
+    b_dir.write_text(filename='helloworld.txt',
+                     data=u'hello', encoding='utf-8')
+
+    ssh_client = paramiko.SSHClient()
+
+    sftp = SFTP(ssh_client=ssh_client)
+
+    sftp.connect(hostname='buildbot.steinwurf.dk', username='buildbot')
+
+    sftp.transfer(source_path=testdirectory.path(),
+                  remote_path='/tmp',
+                  exclude_patterns=[])
 
 
 def test_filetransfer_path_split():
@@ -142,7 +200,7 @@ def test_filelist(testdirectory):
 
     filelist = FileList(source_path=testdirectory.path(),
                         remote_path='/var/www',
-                        exclude_paths=excludes)
+                        exclude_patterns=excludes)
 
     result = list(filelist)
 

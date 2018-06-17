@@ -108,7 +108,8 @@ def _pytest(bld):
 
     with _create_virtualenv(bld=bld) as venv:
 
-        venv.pip_install(['pytest', 'pytest-testdirectory', 'mock'])
+        venv.pip_install(
+            ['pytest', 'pytest-testdirectory', 'mock', 'paramiko'])
 
         # Install the pytest-testdirectory plugin in the virtualenv
         wheel = _find_wheel(ctx=bld)
