@@ -1,8 +1,24 @@
 Introduction
 ============
 
-Build Sphinx documentation for all the different
-versions of your project.
+The Git Iterator ``giit`` is a small tool for running commands on
+branches and tags of a git repository.
+
+It's original purpose was to allow Sphinx documentation to be easily
+generated for all available tags of a bunch of repositories. However,
+should you find an use for it - you should also be able to adapt it
+to other scenarios.
+
+Quick Start
+===========
+
+To use ``giit`` you define a ``giit.json`` file which contains the steps
+you want ``giit`` to be able to run. Note, the ``giit.json`` file can
+live in the root of the repository.
+
+Let's say we want to generate the Sphinx documentation for a specific
+
+
 
 Developer docs
 ==============

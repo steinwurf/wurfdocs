@@ -7,14 +7,33 @@ import wurfdocs.filelist
 class SFTPTransfer(object):
 
     def __init__(self, ssh):
+        """ Create a new instance
+
+        :param ssh: A paramiko.SSHClient object
+        """
+
         self.ssh = ssh
 
     def connect(self, username, hostname):
+        """ Connect to the remote server.
+
+        :param username: The username as a string
+        :param hostname: The hostname as a string
+        """
+
         self.ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         self.ssh.connect(hostname=hostname,
                          username=username)
 
     def transfer(self, source_path, remote_path, exclude_patterns):
+        """ Start a transfer.
+
+        :param source_path: A local directory to be transferred.
+        :param remote_path: The remote location where the files should be
+            copied.
+        :param exclude_patterns: A list of path patterns which should not
+            be copied.
+        """
 
         filelist = wurfdocs.filelist.FileList(
             source_path=source_path,
@@ -24,15 +43,26 @@ class SFTPTransfer(object):
         self.transfer_filelist(filelist=filelist)
 
     def transfer_filelist(self, filelist):
+        """ Start a transfer.
+
+        :param filelist: A FileList object.
+        """
 
         with self.ssh.open_sftp() as sftp:
 
             for fileinfo in filelist:
-                self.transfer_file(sftp=sftp,
-                                   source_file=fileinfo.source_file,
-                                   remote_file=fileinfo.remote_file)
+                self._transfer_file(sftp=sftp,
+                                    source_file=fileinfo.source_file,
+                                    remote_file=fileinfo.remote_file)
 
-    def transfer_file(self, sftp, source_file, remote_file):
+    def _transfer_file(self, sftp, source_file, remote_file):
+        """ Transfer a file.
+
+        :param sftp: The SFTP client ot use.
+        :param source_file: The path to the local file
+        :param remote_file: The path to the remote file.
+        """
+
         remote_path, remote_file = self._path_split(remote_file=remote_file)
 
         for path in remote_path:
@@ -48,6 +78,12 @@ class SFTPTransfer(object):
 
     @staticmethod
     def _path_split(remote_file):
+        """ Split a path into a list of directories and a filename.
+
+        : param remote_file: An absolute remote file path as a string.
+        : return: 2-tuple where the first element is a list of directories and
+            the second element is the filename.
+        """
 
         assert remote_file.startswith('/'), "must be absolute %s" % remote_file
 

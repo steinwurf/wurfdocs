@@ -27,6 +27,22 @@ class Build(object):
 
     def run(self):
 
+        # Location for giit files - if not user specified
+        giit_path = os.path.join(tempfile.gettempdir(), 'giit')
+
+        # Setup some defaults
+        if not self.build_path:
+            self.build_path = os.path.join(giit_path, 'build')
+
+            if not os.path.isdir(self.build_path):
+                os.makedirs(self.build_path)
+
+        if not self.wurfdocs_path:
+            self.wurfdocs_path = os.path.join(giit_path, 'data')
+
+            if not os.path.isdir(self.wurfdocs_path):
+                os.makedirs(self.wurfdocs_path)
+
         logger = logging.getLogger('wurfdocs')
         logger.setLevel(logging.DEBUG)
 

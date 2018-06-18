@@ -12,13 +12,19 @@ class SFTPCommand(object):
 
     def __init__(self, config, sftp, log):
         """
-        :param config: A PythonConfig object
+        :param config: A SFTPConfig object
+        :param sftp: A SFTPTransfer object
+        :param log: The log to use
         """
         self.config = config
         self.sftp = sftp
         self.log = log
 
     def run(self, context):
+        """ Run the SFTP command based on the context
+
+        :param context: A dict containing the context of the command
+        """
 
         self.log.debug("RUN context=%s", context)
 
