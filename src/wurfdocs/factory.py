@@ -6,6 +6,7 @@ import sys
 import hashlib
 import shutil
 import logging
+import paramiko
 
 import wurfdocs.prompt
 import wurfdocs.git
@@ -17,14 +18,20 @@ import wurfdocs.tasks
 import wurfdocs.python_config
 import wurfdocs.python_environment
 import wurfdocs.python_command
+import wurfdocs.sftp_config
+import wurfdocs.sftp_transfer
+import wurfdocs.sftp_command
 
 
 class Factory(object):
 
-    def __init__(self, build_name):
+    def __init__(self):
 
-        self.build_name = build_name
+        self.default_build = None
         self.providers = {}
+
+    def set_default_build(self, default_build):
+        self.default_build = default_build
 
     def provide_value(self, name, value):
 
@@ -51,7 +58,7 @@ class Factory(object):
         return self.providers[name]()
 
     def build(self):
-        return self.require(name=self.build_name)
+        return self.require(name=self.default_build)
 
 
 def require_prompt(factory):
@@ -98,11 +105,23 @@ def require_git_repository(factory):
         log=log, source_branch=source_branch)
 
 
+def provide_output_path(factory):
+
+    return factory.require(name='wurfdocs_path')
+
+
 def provide_clone_path(factory):
 
     data_path = factory.require(name='wurfdocs_path')
 
     return os.path.join(data_path, 'clones')
+
+
+def provide_virtualenv_root_path(factory):
+
+    data_path = factory.require(name='wurfdocs_path')
+
+    return os.path.join(data_path, 'virtualenvs')
 
 
 def require_cache(factory):
@@ -118,24 +137,30 @@ def require_task_generator(factory):
 
     git_repository = factory.require(name='git_repository')
     command = factory.require(name='command')
+    command_config = factory.require(name='command_config')
     build_path = factory.require(name='build_path')
     git = factory.require(name='git')
     # cache = factory.require(name='cache')
 
-    workingtree_generator = wurfdocs.tasks.WorkingtreeGenerator(
-        git_repository=git_repository,
-        command=command, build_path=build_path)
-
-    git_branch_generator = wurfdocs.tasks.GitBranchGenerator(
-        git=git, git_repository=git_repository,
-        command=command, build_path=build_path)
-
     task_generator = wurfdocs.tasks.TaskFactory()
 
-    task_generator.add_generator(workingtree_generator)
-    task_generator.add_generator(git_branch_generator)
+    if 'workingtree' in command_config.scope:
 
-    if command.config.recurse_tags:
+        workingtree_generator = wurfdocs.tasks.WorkingtreeGenerator(
+            git_repository=git_repository,
+            command=command, build_path=build_path)
+
+        task_generator.add_generator(workingtree_generator)
+
+    if 'source_branch' in command_config.scope:
+
+        git_branch_generator = wurfdocs.tasks.GitBranchGenerator(
+            git=git, git_repository=git_repository,
+            command=command, build_path=build_path)
+
+        task_generator.add_generator(git_branch_generator)
+
+    if 'tag' in command_config.scope:
 
         git_tag_generator = wurfdocs.tasks.GitTagGenerator(
             git=git, git_repository=git_repository,
@@ -148,7 +173,8 @@ def require_task_generator(factory):
 
 def resolve_factory(wurfdocs_path, source_branch):
 
-    factory = Factory(build_name='git_repository')
+    factory = Factory()
+    factory.set_default_build(default_build='git_repository')
 
     factory.provide_value(name='git_binary', value='git')
     factory.provide_value(name='wurfdocs_path', value=wurfdocs_path)
@@ -167,7 +193,8 @@ def resolve_factory(wurfdocs_path, source_branch):
 
 def cache_factory(data_path, unique_name):
 
-    factory = Factory(build_name='cache')
+    factory = Factory()
+    factory.set_default_build(default_build='cache')
     factory.provide_value(name='data_path', value=data_path)
     factory.provide_value(name='unique_name', value=unique_name)
     factory.provide_function(name='cache', function=require_cache)
@@ -179,6 +206,13 @@ def require_python_config(factory):
 
     config = factory.require(name='config')
     return wurfdocs.python_config.PythonConfig.from_dict(
+        config=config)
+
+
+def require_sftp_config(factory):
+
+    config = factory.require(name='config')
+    return wurfdocs.sftp_config.SFTPConfig.from_dict(
         config=config)
 
 
@@ -194,7 +228,7 @@ def require_python_environement(factory):
 
 def require_python_command(factory):
 
-    config = factory.require(name='python_config')
+    config = factory.require(name='command_config')
     environment = factory.require(name='python_environment')
     prompt = factory.require(name='prompt')
     log = logging.getLogger(name='wurfdocs.python_command')
@@ -203,25 +237,16 @@ def require_python_command(factory):
         config=config, environment=environment, prompt=prompt, log=log)
 
 
-def build_python_factory(build_path, wurfdocs_path, git_repository,
-                         cache, config):
+def provide_ssh(factory):
+    return paramiko.SSHClient()
 
-    factory = Factory(build_name='require_task_generator')
 
-    factory.provide_value(
-        name='config', value=config)
+def build_python_factory(factory):
 
-    factory.provide_value(
-        name='build_path', value=build_path)
-
-    factory.provide_value(
-        name='wurfdocs_path', value=wurfdocs_path)
-
-    factory.provide_value(
-        name='git_repository', value=git_repository)
+    factory.set_default_build(default_build='require_task_generator')
 
     factory.provide_function(
-        name='python_config', function=require_python_config)
+        name='command_config', function=require_python_config)
 
     factory.provide_function(
         name='prompt', function=require_prompt)
@@ -232,12 +257,11 @@ def build_python_factory(build_path, wurfdocs_path, git_repository,
     factory.provide_function(
         name='command', function=require_python_command)
 
-    factory.provide_value(name='output_path', value=wurfdocs_path)
+    factory.provide_function(name='output_path', function=provide_output_path)
     factory.provide_function(name='clone_path', function=provide_clone_path)
 
-    virtualenv_root_path = os.path.join(wurfdocs_path, 'virtualenvs')
-    factory.provide_value(name='virtualenv_root_path',
-                          value=virtualenv_root_path)
+    factory.provide_function(name='virtualenv_root_path',
+                             function=provide_virtualenv_root_path)
 
     factory.provide_value(name='git_binary', value='git')
 
@@ -251,3 +275,57 @@ def build_python_factory(build_path, wurfdocs_path, git_repository,
         name='require_task_generator', function=require_task_generator)
 
     return factory
+
+
+def provide_sftp(factory):
+
+    ssh = factory.require(name='ssh')
+    return wurfdocs.sftp_transfer.SFTPTransfer(ssh=ssh)
+
+
+def provide_sftp_command(factory):
+
+    config = factory.require(name='command_config')
+    sftp = factory.require(name='sftp')
+    log = logging.getLogger(name='wurfdocs.SFTPCommand')
+
+    return wurfdocs.sftp_command.SFTPCommand(config=config, sftp=sftp, log=log)
+
+
+def build_sftp_factory(factory):
+
+    factory.set_default_build(default_build='require_task_generator')
+
+    factory.provide_function(
+        name='command_config', function=require_sftp_config)
+
+    factory.provide_function(
+        name='command', function=provide_sftp_command)
+
+    factory.provide_function(
+        name='sftp', function=provide_sftp)
+
+    factory.provide_function(
+        name='ssh', function=provide_ssh)
+
+    factory.provide_function(
+        name='require_task_generator', function=require_task_generator)
+
+    factory.provide_value(name='git_binary', value='git')
+    factory.provide_function(name='git', function=require_git)
+    factory.provide_function(name='prompt', function=require_prompt)
+
+    return factory
+
+
+def build_factory(build_type):
+
+    factory = Factory()
+
+    if build_type == 'python':
+        return build_python_factory(factory=factory)
+
+    if build_type == 'sftp':
+        return build_sftp_factory(factory=factory)
+
+    raise RuntimeError("%s not a known build type" % build_type)

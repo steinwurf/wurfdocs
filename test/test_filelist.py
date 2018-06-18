@@ -5,121 +5,8 @@ import os
 import fnmatch
 import paramiko
 
-
-class FileInfo(object):
-
-    def __init__(self, source_file, remote_file):
-        self.source_file = source_file
-        self.remote_file = remote_file
-
-
-class FileList(object):
-
-    def __init__(self, source_path, remote_path, exclude_patterns=[]):
-        self.source_path = source_path
-        self.remote_path = remote_path
-        self.exclude_patterns = exclude_patterns
-
-    def __iter__(self):
-        for root, dirs, files in os.walk(self.source_path, topdown=True):
-
-            for f in files:
-                source_file = os.path.join(root, f)
-
-                if not self._exclude(filename=source_file):
-
-                    relative_path = os.path.relpath(
-                        source_file, self.source_path)
-
-                    remote_file = os.path.join(self.remote_path, relative_path)
-
-                    yield FileInfo(source_file=source_file,
-                                   remote_file=remote_file)
-
-    def _exclude(self, filename):
-
-        for e in self.exclude_patterns:
-
-            if fnmatch.fnmatch(filename, e):
-                return True
-
-        return False
-
-
-class FileTransfer(object):
-
-    def __init__(self, ssh):
-        self.ssh = ssh
-
-    def connect(self, username, hostname):
-        self.ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        self.ssh_.connect(hostname=hostname,
-                          username=username)
-
-    def transfer(self, filelist):
-
-        sftp_client = self.ssh_client.open_sftp()
-
-        for fileinfo in filelist:
-            self.transfer_file(source_file=fileinfo.source_file,
-                               remote_file=fileinfo.remote_file)
-
-    def transfer_file(self, source_file, remote_file):
-        remote_path, remote_file = self._path_split(remote_file=remote_file)
-
-        for path in remote_path:
-
-            try:
-                # http://docs.paramiko.org/en/2.4/api/sftp.html
-                self.sftp.chdir(path=path)
-            except IOError:
-                self.sftp.mkdir(path=path)
-                self.sftp.chdir(path=path)
-
-        self.sftp.put(localpath=source_file, remotepath=remote_file)
-
-    @staticmethod
-    def _path_split(remote_file):
-
-        assert remote_file.startswith('/'), "must be absolute %s" % remote_file
-
-        path = remote_file
-        path_split = []
-
-        while True:
-            path, leaf = os.path.split(path)
-            if leaf:
-                # Adds one element, at the beginning of the list
-                path_split = [leaf] + path_split
-            else:
-                path_split = [path] + path_split
-                break
-
-        return path_split[:-1], path_split[-1]
-
-
-class SFTP(object):
-
-    def __init__(self, ssh_client):
-        self.ssh_client = ssh_client
-
-    def connect(self, username, hostname):
-        self.ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        self.ssh_client.connect(hostname=hostname,
-                                username=username)
-
-    def transfer(self, source_path, remote_path, exclude_patterns):
-
-        sftp_client = self.ssh_client.open_sftp()
-
-        filelist = FileList(source_path=source_path,
-                            remote_path=remote_path,
-                            exclude_patterns=exclude_patterns)
-
-        filetransfer = FileTransfer(filelist=filelist, sftp=sftp_client)
-        filetransfer.transfer()
-
-        sftp_client.close()
+import wurfdocs.filelist
+import wurfdocs.sftp_transfer
 
 
 def test_filetransfer(testdirectory):
@@ -133,20 +20,20 @@ def test_filetransfer(testdirectory):
     b_dir.write_text(filename='helloworld.txt',
                      data=u'hello', encoding='utf-8')
 
-    ssh_client = paramiko.SSHClient()
+    ssh = paramiko.SSHClient()
 
-    sftp = SFTP(ssh_client=ssh_client)
+    filetransfer = wurfdocs.sftp_transfer.SFTPTransfer(ssh=ssh)
+    filetransfer.connect(hostname='buildbot.steinwurf.dk', username='buildbot')
 
-    sftp.connect(hostname='buildbot.steinwurf.dk', username='buildbot')
-
-    sftp.transfer(source_path=testdirectory.path(),
-                  remote_path='/tmp',
-                  exclude_patterns=[])
+    filetransfer.transfer(source_path=testdirectory.path(),
+                          remote_path='/tmp',
+                          exclude_patterns=[])
 
 
 def test_filetransfer_path_split():
 
-    path, filename = FileTransfer._path_split(remote_file='/www/var/file.txt')
+    path, filename = wurfdocs.sftp_transfer.SFTPTransfer._path_split(
+        remote_file='/www/var/file.txt')
 
     assert path == ['/', 'www', 'var']
     assert filename == 'file.txt'
@@ -198,9 +85,10 @@ def test_filelist(testdirectory):
         os.path.join(testdirectory.path(), 'a/*')
     ]
 
-    filelist = FileList(source_path=testdirectory.path(),
-                        remote_path='/var/www',
-                        exclude_patterns=excludes)
+    filelist = wurfdocs.filelist.FileList(
+        source_path=testdirectory.path(),
+        remote_path='/var/www',
+        exclude_patterns=excludes)
 
     result = list(filelist)
 

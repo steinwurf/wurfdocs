@@ -4,6 +4,7 @@ import hashlib
 import os
 import logging
 import json
+import sys
 
 import wurfdocs.factory
 
@@ -26,16 +27,35 @@ class Build(object):
 
     def run(self):
 
-        logfile = os.path.join(self.wurfdocs_path, 'wurfdocs.log')
+        logger = logging.getLogger('wurfdocs')
+        logger.setLevel(logging.DEBUG)
 
-        logging.basicConfig(filename=logfile,
-                            level=logging.DEBUG)
+        # create file handler which logs even debug messages
+        logfile = os.path.join(self.wurfdocs_path, 'wurfdocs.log')
+        fh = logging.FileHandler(logfile)
+        fh.setLevel(logging.DEBUG)
+
+        # create console handler with a higher log level
+        ch = logging.StreamHandler(stream=sys.stdout)
+        ch.setLevel(logging.INFO)
+
+        # create formatter and add it to the handlers
+        formatter = logging.Formatter(
+            '%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+        fh.setFormatter(formatter)
+        ch.setFormatter(formatter)
+
+        # add the handlers to the logger
+        logger.addHandler(fh)
+        logger.addHandler(ch)
 
         log = logging.getLogger('wurfdocs.main')
         log.debug('build_path=%s', self.build_path)
         log.debug('wurfdocs_path=%s', self.wurfdocs_path)
         log.debug('json_config=%s', self.json_config)
         log.debug('source_branch=%s', self.source_branch)
+
+        log.info('Lets go!')
 
         # Resolve the repository
         factory = self.resolve_factory()
@@ -57,16 +77,18 @@ class Build(object):
         with open(self.json_config, 'r') as config_file:
             config = json.load(config_file)
 
+        # All steps has a type which controls the available options and actions
+        build_type = config[self.step]['type']
+
+        factory = wurfdocs.factory.build_factory(build_type=build_type)
+
+        # Provide the different needed by the factory
+        factory.provide_value(name='config', value=config[self.step])
+        factory.provide_value(name='build_path', value=self.build_path)
+        factory.provide_value(name='wurfdocs_path', value=self.wurfdocs_path)
+        factory.provide_value(name='git_repository', value=git_repository)
+
         # Run the command
-        if config[self.step]['type'] == 'python':
-
-            factory = wurfdocs.factory.build_python_factory(
-                build_path=self.build_path, wurfdocs_path=self.wurfdocs_path,
-                git_repository=git_repository, cache=cache,
-                config=config[self.step])
-
-        else:
-            assert 0
 
         with cache:
 

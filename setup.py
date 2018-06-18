@@ -95,6 +95,6 @@ setup(
     keywords=('wurfdocs'),
     packages=find_packages(where='src', exclude=['test']),
     package_dir={"": "src"},
-    install_requires=['click'],
+    install_requires=['click', 'paramiko'],
 
 )

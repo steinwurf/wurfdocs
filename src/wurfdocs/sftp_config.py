@@ -1,7 +1,7 @@
 import os
 
 
-class PythonConfig(object):
+class SFTPConfig(object):
 
     def __init__(self, config):
         self.config = config
@@ -30,23 +30,20 @@ class PythonConfig(object):
     def from_dict(config):
 
         # Mandatory
-        assert config['type'] == 'python'
-        assert len(config['scripts']) > 0
+        assert config['type'] == 'sftp'
+        assert 'username' in config and config['username']
+        assert 'hostname' in config and config['hostname']
+        assert 'remote_path' in config and config['remote_path']
+        assert 'source_path' in config and config['source_path']
 
         # Optional
+        if not 'exclude_patterns' in config:
+            config['exclude_patterns'] = []
+
         if not 'scope' in config:
             config['scope'] = ['source_branch']
 
         if not 'variables' in config:
             config['variables'] = ''
 
-        if not 'requirements' in config:
-            config['requirements'] = None
-
-        if not 'cwd' in config:
-            config['cwd'] = os.getcwd()
-
-        if not 'allow_failure' in config:
-            config['allow_failure'] = False
-
-        return PythonConfig(config=config)
+        return SFTPConfig(config=config)

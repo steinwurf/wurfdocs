@@ -87,7 +87,11 @@ def test_project(testdirectory, caplog):
 
     build.run()
 
-    assert 0
+    build = FakeBuild(directory=project_dir.path(),
+                      step='publish', repository=project_dir.path(),
+                      build_path=build_dir.path(), wurfdocs_path=wurfdocs_dir.path())
+
+    build.run()
 
     # cmd = ['wurfdocs', 'docs', project_dir.path(),
     #        '--build_path', build_dir.path(),
