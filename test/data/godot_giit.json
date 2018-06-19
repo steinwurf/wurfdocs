@@ -1,0 +1,13 @@
+{
+    "docs": {
+        "type": "python",
+        "scripts": [
+            "sphinx-build -b html . ${build_path}"
+        ],
+        "cwd": "${source_path}",
+        "pip_packages": [
+            "sphinx",
+            "sphinx_rtd_theme"
+        ]
+    }
+}

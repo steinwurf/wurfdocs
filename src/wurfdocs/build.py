@@ -56,16 +56,21 @@ class Build(object):
         ch.setLevel(logging.INFO)
 
         # create formatter and add it to the handlers
-        formatter = logging.Formatter(
+        fh_formatter = logging.Formatter(
             '%(asctime)s - %(name)s - %(levelname)s - %(message)s')
-        fh.setFormatter(formatter)
-        ch.setFormatter(formatter)
+        fh.setFormatter(fh_formatter)
+
+        ch_formatter = logging.Formatter('%(message)s')
+        ch.setFormatter(ch_formatter)
 
         # add the handlers to the logger
         logger.addHandler(fh)
         logger.addHandler(ch)
 
         log = logging.getLogger('wurfdocs.main')
+        log.info("Building into: %s", self.build_path)
+
+        # Add details to log file
         log.debug('build_path=%s', self.build_path)
         log.debug('wurfdocs_path=%s', self.wurfdocs_path)
         log.debug('json_config=%s', self.json_config)

@@ -18,7 +18,8 @@ def test_python_environment(testdirectory):
     python_environment = wurfdocs.python_environment.PythonEnvironment(
         prompt=prompt, virtualenv=virtualenv, log=log)
 
-    venv = python_environment.from_requirements(requirements=requirements)
+    venv = python_environment.from_requirements(requirements=requirements,
+                                                pip_packages=None)
 
     assert venv == env
 

@@ -70,7 +70,7 @@ class VirtualEnv(object):
 
             git.checkout(branch=VERSION, cwd=repo_path)
 
-        log.debug('Using virtualenv from {}'.format(URL, repo_path))
+        log.debug('Using virtualenv from {}'.format(repo_path))
 
         env = dict(os.environ)
         env.update({'PYTHONPATH': repo_path})

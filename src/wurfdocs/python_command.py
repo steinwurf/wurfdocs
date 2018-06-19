@@ -26,11 +26,9 @@ class PythonCommand(object):
         reader = wurfdocs.config_reader.ConfigReader(
             config=self.config, context=context)
 
-        if reader.requirements:
-            env = self.environment.from_requirements(
-                requirements=reader.requirements)
-        else:
-            env = self.environment.from_system()
+        env = self.environment.from_requirements(
+            requirements=reader.requirements,
+            pip_packages=reader.pip_packages)
 
         for script in reader.scripts:
 

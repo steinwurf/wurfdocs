@@ -43,6 +43,9 @@ class PythonConfig(object):
         if not 'requirements' in config:
             config['requirements'] = None
 
+        if not 'pip_packages' in config:
+            config['pip_packages'] = None
+
         if not 'cwd' in config:
             config['cwd'] = os.getcwd()
 

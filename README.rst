@@ -17,6 +17,31 @@ you want ``giit`` to be able to run. Note, the ``giit.json`` file can
 live in the root of the repository.
 
 Let's say we want to generate the Sphinx documentation for a specific
+repository.
+
+Example: godot
+--------------
+
+``giit`` uses a ``giit.json`` file to describe the different steps::
+
+    {
+        "docs": {
+            "type": "python",
+            "scripts": [
+                "sphinx-build -b html . ${build_path}"
+            ],
+            "cwd": "${source_path}",
+            "pip_packages": [
+                "sphinx",
+                "sphinx_rtd_theme"
+            ]
+        }
+    }
+Lets build the ``godot`` Sphinx documentation
+(https://github.com/godotengine/godot-docs) by running ``giit``::
+
+    giit docs https://github.com/godotengine/godot-docs.git --json_config ./giit.json
+
 
 
 

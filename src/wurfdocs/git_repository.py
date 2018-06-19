@@ -66,6 +66,8 @@ class GitRepository(object):
                 # If we don't have a source branch we use 'master
                 self.source_branch = 'master'
 
+        self.log.info("Using git repository: %s", git_url)
+
         # Compute the clone path
         git_info = self.git_url_parser.parse(url=git_url)
 
@@ -76,11 +78,13 @@ class GitRepository(object):
 
         # Get the updates
         if os.path.isdir(self.repository_path):
+            self.log.info('Running: git fetch in %s', self.repository_path)
             self.git.fetch(cwd=self.repository_path, all=True)
         else:
+            self.log.info('Running: git clone in %s', self.repository_path)
             self.git.clone(repository=git_url,
                            directory=self.repository_path, cwd=self.clone_path)
 
     def tags(self):
-        """ :return: THe tags specified for the repository """
+        """ :return: The tags specified for the repository """
         return self.git.tags(cwd=self.repository_path)
