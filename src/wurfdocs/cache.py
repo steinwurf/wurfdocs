@@ -7,7 +7,7 @@ import sys
 from . import run_error
 
 
-class Cache:
+class Cache(object:
 
     def __init__(self, cache_path, unique_name):
         """ Open or create a new cache
@@ -19,23 +19,23 @@ class Cache:
         """
 
         # Read the "cache" from json
-        filename = 'cache-' + unique_name + '.json'
-        cache_path = os.path.abspath(os.path.expanduser(cache_path))
+        filename='cache-' + unique_name + '.json'
+        cache_path=os.path.abspath(os.path.expanduser(cache_path))
 
-        self.filepath = os.path.join(cache_path, filename)
+        self.filepath=os.path.join(cache_path, filename)
 
         # Dict which will hold the cached values
-        self.cache = None
+        self.cache=None
 
     def __enter__(self):
 
         if os.path.isfile(self.filepath):
 
             with open(self.filepath, 'r') as json_file:
-                self.cache = json.load(json_file)
+                self.cache=json.load(json_file)
 
         else:
-            self.cache = {}
+            self.cache={}
 
         return self
 
@@ -49,7 +49,7 @@ class Cache:
     def match(self, sha1):
 
         if sha1 in self.cache:
-            path = self.cache[sha1]
+            path=self.cache[sha1]
 
             return os.path.isdir(path)
 
@@ -59,7 +59,7 @@ class Cache:
 
         assert os.path.isdir(path)
 
-        self.cache[sha1] = path
+        self.cache[sha1]=path
 
 
 #

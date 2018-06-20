@@ -77,32 +77,32 @@ def test_project(testdirectory, caplog):
 
     build = FakeBuild(directory=project_dir.path(),
                       step='docs', repository=project_dir.path(),
-                      build_path=build_dir.path(), wurfdocs_path=wurfdocs_dir.path())
+                      build_path=build_dir.path(), data_path=wurfdocs_dir.path())
 
     build.run()
 
     build = FakeBuild(directory=project_dir.path(),
                       step='landing_page', repository=project_dir.path(),
-                      build_path=build_dir.path(), wurfdocs_path=wurfdocs_dir.path())
+                      build_path=build_dir.path(), data_path=wurfdocs_dir.path())
 
     build.run()
 
     build = FakeBuild(directory=project_dir.path(),
                       step='publish', repository=project_dir.path(),
-                      build_path=build_dir.path(), wurfdocs_path=wurfdocs_dir.path())
+                      build_path=build_dir.path(), data_path=wurfdocs_dir.path())
 
     build.run()
 
     # cmd = ['wurfdocs', 'docs', project_dir.path(),
     #        '--build_path', build_dir.path(),
-    #        '--wurfdocs_path', wurfdocs_dir.path(),
+    #        '--data_path', wurfdocs_dir.path(),
     #        '--source_branch', 'origin/add-docs']
 
     # testdirectory.run(cmd)
 
     # cmd = ['wurfdocs', 'landing_page', url,
     #        '--build_path', build_dir.path(),
-    #        '--wurfdocs_path', wurfdocs_dir.path(),
+    #        '--data_path', wurfdocs_dir.path(),
     #        '--json_config', config_file,
     #        '--source_branch', 'origin/add-docs']
 

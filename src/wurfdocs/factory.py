@@ -107,19 +107,19 @@ def require_git_repository(factory):
 
 def provide_output_path(factory):
 
-    return factory.require(name='wurfdocs_path')
+    return factory.require(name='data_path')
 
 
 def provide_clone_path(factory):
 
-    data_path = factory.require(name='wurfdocs_path')
+    data_path = factory.require(name='data_path')
 
     return os.path.join(data_path, 'clones')
 
 
 def provide_virtualenv_root_path(factory):
 
-    data_path = factory.require(name='wurfdocs_path')
+    data_path = factory.require(name='data_path')
 
     return os.path.join(data_path, 'virtualenvs')
 
@@ -171,13 +171,13 @@ def require_task_generator(factory):
     return task_generator
 
 
-def resolve_factory(wurfdocs_path, source_branch):
+def resolve_factory(data_path, source_branch):
 
     factory = Factory()
     factory.set_default_build(default_build='git_repository')
 
     factory.provide_value(name='git_binary', value='git')
-    factory.provide_value(name='wurfdocs_path', value=wurfdocs_path)
+    factory.provide_value(name='data_path', value=data_path)
     factory.provide_value(name='source_branch', value=source_branch)
 
     factory.provide_function(name='clone_path', function=provide_clone_path)
@@ -329,3 +329,52 @@ def build_factory(build_type):
         return build_sftp_factory(factory=factory)
 
     raise RuntimeError("%s not a known build type" % build_type)
+
+
+class GiitJson(object):
+
+    def __init__(self, paths, log):
+        """ A new instance.
+
+        :param paths: A list of paths to search for the giit.json file
+        :param log: A logging object
+        """
+
+        self.paths = paths
+        self.log = log
+
+        # The loaded config dict
+        self.config = None
+
+    def load(self):
+
+        giit_path = self._find_config()
+        self.log.info('Using config: %s', giit_path)
+
+        with open(giit_path, 'r') as giit_file:
+            self.config = json.load(giit_file)
+
+    def _find_config(self):
+
+        for p in self.paths:
+
+            giit_file = os.path.join(p, 'giit.json')
+
+            if os.path.isfile(giit_file):
+                return giit_file
+
+        raise RuntimeError("Could not find giit.json in %s" % self.paths)
+
+    def config(self, step):
+        if step not in self.config:
+            raise RuntimeError("Error step %s not found in giit.json" % step)
+
+        return self.config[step]
+
+    def config_hash(self, step):
+
+        step_config = self.config(step=step)
+        step_json = json.dumps(step_config, sort_keys=True)
+        step_hash = hashlib.sha1(step_json.encode('utf-8')).hexdigest()[:6]
+
+        return step

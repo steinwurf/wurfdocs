@@ -21,7 +21,7 @@ class PythonCommand(object):
 
     def run(self, context):
 
-        self.log.debug("RUN context=%s", context)
+        self.log.debug("context=%s", context)
 
         reader = wurfdocs.config_reader.ConfigReader(
             config=self.config, context=context)
@@ -33,6 +33,8 @@ class PythonCommand(object):
         for script in reader.scripts:
 
             try:
+
+                self.log.info('Python: %s', script)
 
                 self.prompt.run(command=script, cwd=reader.cwd,
                                 env=env)
