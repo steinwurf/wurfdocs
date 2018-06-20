@@ -4,10 +4,11 @@
         "scripts": [
             "sphinx-build -b html . ${build_path}"
         ],
-        "cwd": "${source_path}",
+        "cwd": "${source_path}/docs",
         "pip_packages": [
             "sphinx",
-            "sphinx_rtd_theme"
+            "sphinxcontrib-log-cabinet",
+            "pallets-sphinx-themes"
         ]
     }
 }
