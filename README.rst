@@ -134,42 +134,81 @@ In the above ``${build_path}`` will be substituted for the default
 The following built-in variables are available:
 
 * ``build_path``: The path where the produced output should go.
+* ``source_path``: The path to the repository
+* ``name``: Identifier depending on the scope e.g. branch name or
+   tag name.
+* ``scope``: The scope we are in.
 
 Step user variables
 --------------------
 
+The user can define variables using the ``variables`` attribute.
+User variables are define using the following syntax::
 
+    scope:name:variable_name
 
+Where ``scope`` and ``name`` are optional.
+
+This can be used to customize e.g. the ``build_path``. Consider
+the following example::
+
+    {
+        "sphinx": {
+            "type": "python",
+            "scripts": [
+                "sphinx-build -b html . ${output_path}"
+            ],
+            ...
+            "variables": {
+                "source_branch:master:output_path": "${build_path}/docs/latest",
+                "source_branch:output_path": "${build_path}/sphinx/${name}",
+                "tag:output_path": "${build_path}/docs/${name}",
+                "workingtree:output_path": "${build_path}/workingtree/sphinx"
+            }
+        }
+    }
+
+When calling ``sphinx-build`` we use the user defined ``output_path``
+variable.
+
+Let walk though the different values ``output_path`` can take.
+
+* If scope is ``source_branch`` and the branch is ``master`` then
+  ``output_path`` will be ``${build_path}/docs/latest``.
+* For all other branches ``output_path`` will be
+  ``${build_path}/sphinx/${name}`` where ``${name}`` will be the
+  branch name.
+* For the tags ``output_path`` will be ``${build_path}/docs/${name}``
+  where name is the tag value e.g. ``1.0.0`` etc.
+* Finally if we are in the ``workingtree`` scope the ``output_path``
+  variable will be ``${build_path}/workingtree/sphinx``
+
+Lets see how this could look (``build_path`` is ``/tmp/project``)::
+
+    Tag 1.0.0 -----------> /tmp/project/docs/1.0.0
+    Tag 1.0.0 -----------> /tmp/project/docs/2.0.0
+    Tag 1.0.0 -----------> /tmp/project/docs/2.1.0
+    Tag 1.0.0 -----------> /tmp/project/docs/3.0.0
+    Branch master -------> /tmp/project/docs/latest
+    Branch trying_new ---> /tmp/project/sphinx/trying_new
+    Branch new_idea -----> /tmp/project/sphinx/new_idea
+    Workingtree ---------> /tmp/project/workingtree
 
 ``python`` step
 ...............
 
 The ``python`` step supports the following attributes:
 
-* ``scripts``: A list of commands to execute
-* ``cwd``: The path where commands will be executed
-* ``requirements``: Path to a ``pip`` requirements file containing
+* Mandatory ``scripts``: A list of commands to execute
+* Optional ``cwd``: The path where commands will be executed
+* Optional ``requirements``: Path to a ``pip`` requirements file containing
   dependencies to be installed. If specified a virtualenv will
   created.
-* ``pip_packages``: A list of ``pip`` packages to install. If
+* Optional ``pip_packages``: A list of ``pip`` packages to install. If
   specified a virtualenv will created.
-* ``scope``: A list of ``scope`` names for which the step will run.
-  See sect
-
-Step variables
---------------
-
-In each step variables can be used to customize the behavior.
-
-Built-in variables
-..................
-
-The following built in variables are available in all steps:
-
-* ``source_path``: This is the path to the
-
-
-
+* Optional ``scope``: A list of ``scope`` names for which the step will run.
+* Optional ``allow_failure``: A boolean indicating whether we
+  allow the scripts to fail.
 
 ``giit`` command line arguments
 ===============================

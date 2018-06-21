@@ -8,5 +8,3 @@ def test_godot(testdirectory):
            '--json_config', config_file]
 
     print(testdirectory.run(cmd))
-
-    assert 0

@@ -20,7 +20,7 @@ class FileList(object):
                 if not self._exclude(filename=local_file):
 
                     relative_path = os.path.relpath(
-                        local_file, self.source_path)
+                        local_file, self.local_path)
 
                     remote_file = os.path.join(self.remote_path, relative_path)
 

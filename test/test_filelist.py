@@ -86,17 +86,17 @@ def test_filelist(testdirectory):
     ]
 
     filelist = wurfdocs.filelist.FileList(
-        source_path=testdirectory.path(),
+        local_path=testdirectory.path(),
         remote_path='/var/www',
         exclude_patterns=excludes)
 
     result = list(filelist)
 
-    source_result = [f.local_file for f in result]
+    local_result = [f.local_file for f in result]
     remote_result = [f.remote_file for f in result]
 
     # There should be 4 files
-    assert len(source_result) == 4
+    assert len(local_result) == 4
     assert len(remote_result) == 4
 
     file1 = os.path.join(testdirectory.path(), 'b/b.txt')
@@ -104,10 +104,10 @@ def test_filelist(testdirectory):
     file3 = os.path.join(testdirectory.path(), 'c/c.txt')
     file4 = os.path.join(testdirectory.path(), 'd/d.txt')
 
-    assert file1 in source_result
-    assert file2 in source_result
-    assert file3 in source_result
-    assert file4 in source_result
+    assert file1 in local_result
+    assert file2 in local_result
+    assert file3 in local_result
+    assert file4 in local_result
 
     file1 = '/var/www/b/b.txt'
     file2 = '/var/www/b/c/b_c.txt'

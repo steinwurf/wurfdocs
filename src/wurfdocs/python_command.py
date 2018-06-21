@@ -26,24 +26,31 @@ class PythonCommand(object):
         reader = wurfdocs.config_reader.ConfigReader(
             config=self.config, context=context)
 
-        env = self.environment.from_requirements(
-            requirements=reader.requirements,
-            pip_packages=reader.pip_packages)
+        # We might try to access a requirements.txt file in the
+        # repository here. This may fail on older tags etc. and
+        # that is OK if allow_failure is true
+        try:
+            env = self.environment.from_requirements(
+                requirements=reader.requirements,
+                pip_packages=reader.pip_packages)
+
+        except Exception:
+
+            if reader.allow_failure:
+                self.log.exception('Create environment')
+            else:
+                raise
 
         for script in reader.scripts:
 
             try:
-
                 self.log.info('Python: %s', script)
-
                 self.prompt.run(command=script, cwd=reader.cwd,
                                 env=env)
 
             except Exception:
 
                 if reader.allow_failure:
-                    self.log.debug("#TEMP Caught exception")
-                    self.log.exception('run')
+                    self.log.exception('Run command')
                 else:
-                    self.log.debug("#TEMP Raise exception")
                     raise
