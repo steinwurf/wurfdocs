@@ -1,7 +1,7 @@
 import os
 import fnmatch
 
-import wurfdocs.fileinfo
+import giit.fileinfo
 
 
 class FileList(object):
@@ -24,7 +24,7 @@ class FileList(object):
 
                     remote_file = os.path.join(self.remote_path, relative_path)
 
-                    yield wurfdocs.fileinfo.FileInfo(
+                    yield giit.fileinfo.FileInfo(
                         local_file=local_file,
                         remote_file=remote_file)
 

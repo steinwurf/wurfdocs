@@ -2,11 +2,11 @@ import logging
 import shutil
 import os
 
-import wurfdocs.build
-import wurfdocs.git
+import giit.build
+import giit.git
 
 
-class FakeGit(wurfdocs.git.Git):
+class FakeGit(giit.git.Git):
 
     def __init__(self, directory, **kwargs):
 
@@ -15,7 +15,7 @@ class FakeGit(wurfdocs.git.Git):
         self.directory = directory
 
     def remote_origin_url(self, cwd):
-        return "https://github.com/steinwurf/wurfdocs.git"
+        return "https://github.com/steinwurf/giit.git"
 
     def clone(self, repository, directory, cwd):
 
@@ -33,7 +33,7 @@ def require_fake_git(factory):
                    directory=fake_project_path)
 
 
-class FakeBuild(wurfdocs.build.Build):
+class FakeBuild(giit.build.Build):
 
     def __init__(self, directory, **kwargs):
 
@@ -73,36 +73,36 @@ def test_project(testdirectory, caplog):
 
     project_dir = mkdir_project(testdirectory)
     build_dir = testdirectory.mkdir('build')
-    wurfdocs_dir = testdirectory.mkdir('wurfdocs')
+    giit_dir = testdirectory.mkdir('giit')
 
     build = FakeBuild(directory=project_dir.path(),
                       step='docs', repository=project_dir.path(),
-                      build_path=build_dir.path(), data_path=wurfdocs_dir.path())
+                      build_path=build_dir.path(), data_path=giit_dir.path())
 
     build.run()
 
     build = FakeBuild(directory=project_dir.path(),
                       step='landing_page', repository=project_dir.path(),
-                      build_path=build_dir.path(), data_path=wurfdocs_dir.path())
+                      build_path=build_dir.path(), data_path=giit_dir.path())
 
     build.run()
 
     build = FakeBuild(directory=project_dir.path(),
                       step='publish', repository=project_dir.path(),
-                      build_path=build_dir.path(), data_path=wurfdocs_dir.path())
+                      build_path=build_dir.path(), data_path=giit_dir.path())
 
     build.run()
 
-    # cmd = ['wurfdocs', 'docs', project_dir.path(),
+    # cmd = ['giit', 'docs', project_dir.path(),
     #        '--build_path', build_dir.path(),
-    #        '--data_path', wurfdocs_dir.path(),
+    #        '--data_path', giit_dir.path(),
     #        '--source_branch', 'origin/add-docs']
 
     # testdirectory.run(cmd)
 
-    # cmd = ['wurfdocs', 'landing_page', url,
+    # cmd = ['giit', 'landing_page', url,
     #        '--build_path', build_dir.path(),
-    #        '--data_path', wurfdocs_dir.path(),
+    #        '--data_path', giit_dir.path(),
     #        '--json_config', config_file,
     #        '--source_branch', 'origin/add-docs']
 

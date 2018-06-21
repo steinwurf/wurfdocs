@@ -1,7 +1,7 @@
 import mock
 import pytest
 
-import wurfdocs.variables_reader
+import giit.variables_reader
 
 
 def test_variables():
@@ -22,7 +22,7 @@ def test_variables():
         'source_path': '/tmp/clone'
     }
 
-    v = wurfdocs.variables_reader.VariablesReader(
+    v = giit.variables_reader.VariablesReader(
         variables=variables, context=context)
 
     r = v.expand(element='$out likes')
@@ -45,7 +45,7 @@ def test_variables_not_found():
         'source_path': '/tmp/clone'
     }
 
-    v = wurfdocs.variables_reader.VariablesReader(
+    v = giit.variables_reader.VariablesReader(
         variables=variables, context=context)
 
     with pytest.raises(AttributeError):

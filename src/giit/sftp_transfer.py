@@ -1,7 +1,7 @@
 import os
 import paramiko
 
-import wurfdocs.filelist
+import giit.filelist
 
 
 class SFTPTransfer(object):
@@ -35,7 +35,7 @@ class SFTPTransfer(object):
             be copied.
         """
 
-        filelist = wurfdocs.filelist.FileList(
+        filelist = giit.filelist.FileList(
             local_path=local_path,
             remote_path=remote_path,
             exclude_patterns=exclude_patterns)

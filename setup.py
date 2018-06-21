@@ -61,7 +61,7 @@ def find_version():
 VERSION = find_version()
 
 setup(
-    name='wurfdocs',
+    name='giit',
     version=VERSION,
     description=("Wrapper for Sphinx's sphinx-build command."),
     long_description=long_description,
@@ -90,9 +90,9 @@ setup(
         'Topic :: Utilities',
     ],
     entry_points={
-        'console_scripts': ['wurfdocs=wurfdocs.__main__:cli'],
+        'console_scripts': ['giit=giit.__main__:cli'],
     },
-    keywords=('wurfdocs'),
+    keywords=('giit'),
     packages=find_packages(where='src', exclude=['test']),
     package_dir={"": "src"},
     install_requires=['click', 'paramiko'],

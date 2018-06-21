@@ -5,7 +5,7 @@ import os
 import sys
 import hashlib
 
-import wurfdocs.config_reader
+import giit.config_reader
 
 
 class PythonCommand(object):
@@ -23,7 +23,7 @@ class PythonCommand(object):
 
         self.log.debug("context=%s", context)
 
-        reader = wurfdocs.config_reader.ConfigReader(
+        reader = giit.config_reader.ConfigReader(
             config=self.config, context=context)
 
         # We might try to access a requirements.txt file in the

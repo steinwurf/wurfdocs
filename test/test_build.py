@@ -1,24 +1,24 @@
 def test_build(testdirectory):
 
     build_dir = testdirectory.mkdir('build')
-    wurfdocs_dir = testdirectory.mkdir('wurfdocs')
-    config_file = testdirectory.copy_file('test/data/wurfdocs.json')
+    giit_dir = testdirectory.mkdir('giit')
+    config_file = testdirectory.copy_file('test/data/giit.json')
 
     url = 'git@github.com:steinwurf/stub.git'
 
-    cmd = ['wurfdocs', 'sphinx', url,
+    cmd = ['giit', 'sphinx', url,
            '--json_config', config_file,
            '--source_branch', 'origin/add-docs']
 
     testdirectory.run(cmd)
 
-    cmd = ['wurfdocs', 'landing_page', url,
+    cmd = ['giit', 'landing_page', url,
            '--json_config', config_file,
            '--source_branch', 'origin/add-docs']
 
     testdirectory.run(cmd)
 
-    cmd = ['wurfdocs', 'publish', url,
+    cmd = ['giit', 'publish', url,
            '--json_config', config_file]
 
     testdirectory.run(cmd)

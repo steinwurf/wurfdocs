@@ -1,7 +1,7 @@
 import mock
 import os
 
-import wurfdocs
+import giit
 
 
 class SystemEnvironment(object):

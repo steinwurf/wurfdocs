@@ -1,8 +1,8 @@
 
-import wurfdocs.prompt
+import giit.prompt
 
 
 def test_run(testdirectory):
 
-    prompt = wurfdocs.prompt.Prompt()
+    prompt = giit.prompt.Prompt()
     prompt.run('python --version', cwd=testdirectory.path())

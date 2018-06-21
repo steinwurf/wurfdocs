@@ -1,5 +1,5 @@
 import mock
-import wurfdocs.config_reader
+import giit.config_reader
 
 
 def test_config_reader():
@@ -21,7 +21,7 @@ def test_config_reader():
         }
     }
 
-    config = wurfdocs.python_config.PythonConfig.from_dict(
+    config = giit.python_config.PythonConfig.from_dict(
         config=config_dict)
 
     context = {
@@ -31,7 +31,7 @@ def test_config_reader():
         'source_path': '/tmp/clone'
     }
 
-    reader = wurfdocs.config_reader.ConfigReader(
+    reader = giit.config_reader.ConfigReader(
         config=config, context=context)
 
     assert len(reader.scripts) == 1

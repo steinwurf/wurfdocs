@@ -70,7 +70,7 @@ def build(bld):
     # when we build a wheel. But, it is - perhaps in the future there will
     # be some way to disable its creation.
     egg_info = os.path.join(
-        'src', 'wurfdocs.egg-info')
+        'src', 'giit.egg-info')
 
     if os.path.isdir(egg_info):
         waflib.extras.wurf.directory.remove_directory(path=egg_info)

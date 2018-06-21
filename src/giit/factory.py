@@ -8,19 +8,19 @@ import shutil
 import logging
 import paramiko
 
-import wurfdocs.prompt
-import wurfdocs.git
-import wurfdocs.git_url_parser
-import wurfdocs.git_repository
-import wurfdocs.cache
-import wurfdocs.virtualenv
-import wurfdocs.tasks
-import wurfdocs.python_config
-import wurfdocs.python_environment
-import wurfdocs.python_command
-import wurfdocs.sftp_config
-import wurfdocs.sftp_transfer
-import wurfdocs.sftp_command
+import giit.prompt
+import giit.git
+import giit.git_url_parser
+import giit.git_repository
+import giit.cache
+import giit.virtualenv
+import giit.tasks
+import giit.python_config
+import giit.python_environment
+import giit.python_command
+import giit.sftp_config
+import giit.sftp_transfer
+import giit.sftp_command
 
 
 class Factory(object):
@@ -62,7 +62,7 @@ class Factory(object):
 
 
 def require_prompt(factory):
-    return wurfdocs.prompt.Prompt()
+    return giit.prompt.Prompt()
 
 
 def require_git(factory):
@@ -70,11 +70,11 @@ def require_git(factory):
     prompt = factory.require(name='prompt')
     git_binary = factory.require(name='git_binary')
 
-    return wurfdocs.git.Git(git_binary=git_binary, prompt=prompt)
+    return giit.git.Git(git_binary=git_binary, prompt=prompt)
 
 
 def require_git_url_parser(factory):
-    return wurfdocs.git_url_parser.GitUrlParser()
+    return giit.git_url_parser.GitUrlParser()
 
 
 def require_virtualenv(factory):
@@ -82,12 +82,12 @@ def require_virtualenv(factory):
     git = factory.require(name='git')
     clone_path = factory.require(name='clone_path')
     virtualenv_root_path = factory.require(name='virtualenv_root_path')
-    log = logging.getLogger(name='wurfdocs.virtualenv')
+    log = logging.getLogger(name='giit.virtualenv')
 
-    venv = wurfdocs.virtualenv.VirtualEnv.from_git(
+    venv = giit.virtualenv.VirtualEnv.from_git(
         git=git, clone_path=clone_path, log=log)
 
-    venv = wurfdocs.virtualenv.NameToPathAdapter(
+    venv = giit.virtualenv.NameToPathAdapter(
         virtualenv=venv, virtualenv_root_path=virtualenv_root_path)
 
     return venv
@@ -97,10 +97,10 @@ def require_git_repository(factory):
     git = factory.require(name='git')
     git_url_parser = factory.require(name='git_url_parser')
     source_branch = factory.require(name='source_branch')
-    log = logging.getLogger(name='wurfdocs.git_repository')
+    log = logging.getLogger(name='giit.git_repository')
     clone_path = factory.require(name='clone_path')
 
-    return wurfdocs.git_repository.GitRepository(
+    return giit.git_repository.GitRepository(
         git=git, git_url_parser=git_url_parser, clone_path=clone_path,
         log=log, source_branch=source_branch)
 
@@ -129,7 +129,7 @@ def require_cache(factory):
     data_path = factory.require(name='data_path')
     unique_name = factory.require(name='unique_name')
 
-    return wurfdocs.cache.Cache(
+    return giit.cache.Cache(
         cache_path=data_path, unique_name=unique_name)
 
 
@@ -142,11 +142,11 @@ def require_task_generator(factory):
     git = factory.require(name='git')
     # cache = factory.require(name='cache')
 
-    task_generator = wurfdocs.tasks.TaskFactory()
+    task_generator = giit.tasks.TaskFactory()
 
     if 'workingtree' in command_config.scope:
 
-        workingtree_generator = wurfdocs.tasks.WorkingtreeGenerator(
+        workingtree_generator = giit.tasks.WorkingtreeGenerator(
             git_repository=git_repository,
             command=command, build_path=build_path)
 
@@ -154,7 +154,7 @@ def require_task_generator(factory):
 
     if 'source_branch' in command_config.scope:
 
-        git_branch_generator = wurfdocs.tasks.GitBranchGenerator(
+        git_branch_generator = giit.tasks.GitBranchGenerator(
             git=git, git_repository=git_repository,
             command=command, build_path=build_path)
 
@@ -162,7 +162,7 @@ def require_task_generator(factory):
 
     if 'tag' in command_config.scope:
 
-        git_tag_generator = wurfdocs.tasks.GitTagGenerator(
+        git_tag_generator = giit.tasks.GitTagGenerator(
             git=git, git_repository=git_repository,
             command=command, build_path=build_path)
 
@@ -205,14 +205,14 @@ def cache_factory(data_path, unique_name):
 def require_python_config(factory):
 
     config = factory.require(name='config')
-    return wurfdocs.python_config.PythonConfig.from_dict(
+    return giit.python_config.PythonConfig.from_dict(
         config=config)
 
 
 def require_sftp_config(factory):
 
     config = factory.require(name='config')
-    return wurfdocs.sftp_config.SFTPConfig.from_dict(
+    return giit.sftp_config.SFTPConfig.from_dict(
         config=config)
 
 
@@ -220,9 +220,9 @@ def require_python_environement(factory):
 
     prompt = factory.require(name='prompt')
     virtualenv = factory.require(name='virtualenv')
-    log = logging.getLogger(name='wurfdocs.python_environement')
+    log = logging.getLogger(name='giit.python_environement')
 
-    return wurfdocs.python_environment.PythonEnvironment(
+    return giit.python_environment.PythonEnvironment(
         prompt=prompt, virtualenv=virtualenv, log=log)
 
 
@@ -231,9 +231,9 @@ def require_python_command(factory):
     config = factory.require(name='command_config')
     environment = factory.require(name='python_environment')
     prompt = factory.require(name='prompt')
-    log = logging.getLogger(name='wurfdocs.python_command')
+    log = logging.getLogger(name='giit.python_command')
 
-    return wurfdocs.python_command.PythonCommand(
+    return giit.python_command.PythonCommand(
         config=config, environment=environment, prompt=prompt, log=log)
 
 
@@ -280,16 +280,16 @@ def build_python_factory(factory):
 def provide_sftp(factory):
 
     ssh = factory.require(name='ssh')
-    return wurfdocs.sftp_transfer.SFTPTransfer(ssh=ssh)
+    return giit.sftp_transfer.SFTPTransfer(ssh=ssh)
 
 
 def provide_sftp_command(factory):
 
     config = factory.require(name='command_config')
     sftp = factory.require(name='sftp')
-    log = logging.getLogger(name='wurfdocs.SFTPCommand')
+    log = logging.getLogger(name='giit.SFTPCommand')
 
-    return wurfdocs.sftp_command.SFTPCommand(config=config, sftp=sftp, log=log)
+    return giit.sftp_command.SFTPCommand(config=config, sftp=sftp, log=log)
 
 
 def build_sftp_factory(factory):

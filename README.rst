@@ -344,8 +344,8 @@ wurfpipe.json
     ]
 }
 
-./wurfdocs build https://stub.git --build_path=/tmp/out --clone_path=/tmp/clone
-./wurfdocs publish https://stub.git --build_path=/tmp/out
+./giit build https://stub.git --build_path=/tmp/out --clone_path=/tmp/clone
+./giit publish https://stub.git --build_path=/tmp/out
 
 
 def build(ctx):
@@ -365,7 +365,7 @@ def publish(ctx):
             'script': 'python sphinx-build -b html . ${BUILD_PATH}/docs/${RECURSE_ID}'
 
 
-./wurfdocs build https://stub.git --build_path=/tmp/build --working_path=/tmp/clone --checkout=api
+./giit build https://stub.git --build_path=/tmp/build --working_path=/tmp/clone --checkout=api
 
 
 Source checkout
@@ -373,7 +373,7 @@ Source checkout
 
 A build is always done from a ``source checkout`` which can be any branch.
 
-If no explicit ``source checkout`` is specified ``wurfdocs`` will use the PATH
+If no explicit ``source checkout`` is specified ``giit`` will use the PATH
 or URL for the repository to determine one.
 
 * For a URL the ``source checkout`` will always be master.

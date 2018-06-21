@@ -6,7 +6,7 @@ import logging
 import json
 import sys
 
-import wurfdocs.factory
+import giit.factory
 
 
 class Build(object):
@@ -37,11 +37,11 @@ class Build(object):
             if not os.path.isdir(self.data_path):
                 os.makedirs(self.data_path)
 
-        logger = logging.getLogger('wurfdocs')
+        logger = logging.getLogger('giit')
         logger.setLevel(logging.DEBUG)
 
         # create file handler which logs even debug messages
-        logfile = os.path.join(self.data_path, 'wurfdocs.log')
+        logfile = os.path.join(self.data_path, 'giit.log')
         fh = logging.FileHandler(logfile)
         fh.setLevel(logging.DEBUG)
 
@@ -61,7 +61,7 @@ class Build(object):
         logger.addHandler(fh)
         logger.addHandler(ch)
 
-        log = logging.getLogger('wurfdocs.main')
+        log = logging.getLogger('giit.main')
 
         # Add details to log file
         log.debug('build_path=%s', self.build_path)
@@ -111,7 +111,7 @@ class Build(object):
         # actions
         build_type = config[self.step]['type']
 
-        factory = wurfdocs.factory.build_factory(build_type=build_type)
+        factory = giit.factory.build_factory(build_type=build_type)
 
         # Provide the different needed by the factory
         factory.provide_value(name='config', value=config[self.step])
@@ -131,11 +131,11 @@ class Build(object):
                 task.run()
 
     def resolve_factory(self):
-        return wurfdocs.factory.resolve_factory(
+        return giit.factory.resolve_factory(
             data_path=self.data_path,
             source_branch=self.source_branch)
 
     def clone_factory(self, unique_name):
-        return wurfdocs.factory.cache_factory(
+        return giit.factory.cache_factory(
             data_path=self.data_path,
             unique_name=unique_name)

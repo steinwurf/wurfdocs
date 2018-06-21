@@ -1,6 +1,6 @@
 import os
 import mock
-import wurfdocs.python_config
+import giit.python_config
 
 
 def test_python_config():
@@ -12,7 +12,7 @@ def test_python_config():
         ]
     }
 
-    config_out = wurfdocs.python_config.PythonConfig.from_dict(
+    config_out = giit.python_config.PythonConfig.from_dict(
         config=config_in)
 
     assert config_out.type == 'python'

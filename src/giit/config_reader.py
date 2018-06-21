@@ -1,6 +1,6 @@
-import wurfdocs.python_config
-import wurfdocs.variables_reader
-import wurfdocs.compat
+import giit.python_config
+import giit.variables_reader
+import giit.compat
 
 
 class ConfigReader(object):
@@ -12,7 +12,7 @@ class ConfigReader(object):
         :param context: Dict containing the context
         """
         self.config = config
-        self.variables = wurfdocs.variables_reader.VariablesReader(
+        self.variables = giit.variables_reader.VariablesReader(
             variables=config.variables, context=context)
 
     def __getattr__(self, attribute):
@@ -26,7 +26,7 @@ class ConfigReader(object):
 
     def _expand(self, element):
 
-        if isinstance(element, wurfdocs.compat.string_type):
+        if isinstance(element, giit.compat.string_type):
             return self.variables.expand(element=element)
 
         if isinstance(element, list):

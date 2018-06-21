@@ -1,6 +1,6 @@
 import click
 
-import wurfdocs.build
+import giit.build
 
 
 @click.command()
@@ -13,7 +13,7 @@ import wurfdocs.build
 def cli(step, repository, build_path, data_path, json_config,
         source_branch):
 
-    build = wurfdocs.build.Build(
+    build = giit.build.Build(
         step=step, repository=repository,
         build_path=build_path, data_path=data_path,
         json_config=json_config, source_branch=source_branch)

@@ -5,7 +5,7 @@ import os
 import sys
 import hashlib
 
-import wurfdocs.config_reader
+import giit.config_reader
 
 
 class SFTPCommand(object):
@@ -28,7 +28,7 @@ class SFTPCommand(object):
 
         self.log.debug("RUN context=%s", context)
 
-        reader = wurfdocs.config_reader.ConfigReader(
+        reader = giit.config_reader.ConfigReader(
             config=self.config, context=context)
 
         hostname = reader.hostname

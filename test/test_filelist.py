@@ -5,8 +5,8 @@ import os
 import fnmatch
 import paramiko
 
-import wurfdocs.filelist
-import wurfdocs.sftp_transfer
+import giit.filelist
+import giit.sftp_transfer
 
 
 def test_filetransfer(testdirectory):
@@ -22,7 +22,7 @@ def test_filetransfer(testdirectory):
 
     ssh = paramiko.SSHClient()
 
-    filetransfer = wurfdocs.sftp_transfer.SFTPTransfer(ssh=ssh)
+    filetransfer = giit.sftp_transfer.SFTPTransfer(ssh=ssh)
     filetransfer.connect(hostname='buildbot.steinwurf.dk', username='buildbot')
 
     filetransfer.transfer(local_path=testdirectory.path(),
@@ -32,7 +32,7 @@ def test_filetransfer(testdirectory):
 
 def test_filetransfer_path_split():
 
-    path, filename = wurfdocs.sftp_transfer.SFTPTransfer._path_split(
+    path, filename = giit.sftp_transfer.SFTPTransfer._path_split(
         remote_file='/www/var/file.txt')
 
     assert path == ['/', 'www', 'var']
@@ -85,7 +85,7 @@ def test_filelist(testdirectory):
         os.path.join(testdirectory.path(), 'a/*')
     ]
 
-    filelist = wurfdocs.filelist.FileList(
+    filelist = giit.filelist.FileList(
         local_path=testdirectory.path(),
         remote_path='/var/www',
         exclude_patterns=excludes)

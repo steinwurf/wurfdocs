@@ -1,9 +1,9 @@
-import wurfdocs.git
-import wurfdocs.prompt
+import giit.git
+import giit.prompt
 
 
 def test_git(testdirectory):
-    git = wurfdocs.git.Git(
-        git_binary='git', prompt=wurfdocs.prompt.Prompt())
+    git = giit.git.Git(
+        git_binary='git', prompt=giit.prompt.Prompt())
 
     print(git.version(cwd=testdirectory.path()))

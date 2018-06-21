@@ -4,7 +4,7 @@ def test_godot(testdirectory):
 
     url = 'https://github.com/urllib3/urllib3.git'
 
-    cmd = ['wurfdocs', 'docs', url,
+    cmd = ['giit', 'docs', url,
            '--json_config', config_file]
 
     print(testdirectory.run(cmd))

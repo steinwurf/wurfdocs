@@ -2,8 +2,8 @@ import mock
 import os
 import sys
 
-import wurfdocs
-import wurfdocs.virtualenv as venv
+import giit
+import giit.virtualenv as venv
 
 
 def test_virtualenv_from_git(testdirectory):

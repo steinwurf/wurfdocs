@@ -1,4 +1,4 @@
-from wurfdocs.git_url_parser import GitUrlParser
+from giit.git_url_parser import GitUrlParser
 
 
 def test_git_url_parser_no_protocol():

@@ -1,5 +1,5 @@
-import wurfdocs
-from wurfdocs.cache import Cache
+import giit
+from giit.cache import Cache
 
 
 def test_cache(testdirectory):
