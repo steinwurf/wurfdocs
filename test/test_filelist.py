@@ -39,11 +39,12 @@ def test_filetransfer_path_split():
     assert filename == 'file.txt'
 
 
-def test_filelist(testdirectory):
-    a_dir = testdirectory.mkdir('a')
-    b_dir = testdirectory.mkdir('b')
-    c_dir = testdirectory.mkdir('c')
-    d_dir = testdirectory.mkdir('d')
+def mkdir_layout(parent_dir):
+
+    a_dir = parent_dir.mkdir('a')
+    b_dir = parent_dir.mkdir('b')
+    c_dir = parent_dir.mkdir('c')
+    d_dir = parent_dir.mkdir('d')
 
     a_dir.write_text(filename='a.txt', data=u'a', encoding='utf-8')
     b_dir.write_text(filename='b.txt', data=u'b', encoding='utf-8')
@@ -79,6 +80,11 @@ def test_filelist(testdirectory):
     #     └── d.txt
 
     # 8 directories, 8 files
+
+
+def test_filelist(testdirectory):
+
+    mkdir_layout(parent_dir=testdirectory)
 
     excludes = [
         os.path.join(testdirectory.path(), 'c/d/*'),

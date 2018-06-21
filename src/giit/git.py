@@ -153,11 +153,18 @@ class Git(object):
         # * (HEAD detached at waf-1.9.7)
         return current.startswith('(') and current.endswith(')')
 
-    def checkout(self, branch, cwd):
+    def checkout(self, branch, cwd, orphan=False):
         """
         Runs 'git checkout branch'
         """
-        args = [self.git_binary, 'checkout', branch]
+
+        args = [self.git_binary, 'checkout']
+
+        if orphan:
+            args.append('--orphan')
+
+        args.append(branch)
+
         self.prompt.run(args, cwd=cwd)
 
     def has_submodules(run, cwd):
