@@ -1,10 +1,12 @@
 def test_godot(testdirectory):
 
-    config_file = testdirectory.copy_file('test/data/flask_giit.json')
+    config_file = testdirectory.copy_file('test/data/urllib3_giit.json')
 
-    url = 'https://github.com/pallets/flask'
+    url = 'https://github.com/urllib3/urllib3.git'
 
     cmd = ['wurfdocs', 'docs', url,
            '--json_config', config_file]
 
-    # testdirectory.run(cmd)
+    print(testdirectory.run(cmd))
+
+    assert 0

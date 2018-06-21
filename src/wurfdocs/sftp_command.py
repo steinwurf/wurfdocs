@@ -36,9 +36,9 @@ class SFTPCommand(object):
 
         self.sftp.connect(hostname=hostname, username=username)
 
-        source_path = reader.source_path
+        local_path = reader.local_path
         remote_path = reader.remote_path
         exclude_patterns = reader.exclude_patterns
 
-        self.sftp.transfer(source_path=source_path, remote_path=remote_path,
+        self.sftp.transfer(local_path=local_path, remote_path=remote_path,
                            exclude_patterns=exclude_patterns)

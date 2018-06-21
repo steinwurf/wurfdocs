@@ -41,7 +41,9 @@ class PythonCommand(object):
 
             except Exception:
 
-                if not reader.allow_failure:
-                    raise
-                else:
+                if reader.allow_failure:
+                    self.log.debug("#TEMP Caught exception")
                     self.log.exception('run')
+                else:
+                    self.log.debug("#TEMP Raise exception")
+                    raise

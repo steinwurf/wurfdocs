@@ -128,12 +128,7 @@ class Build(object):
             tasks = task_generator.tasks()
 
             for task in tasks:
-
-                try:
-                    task.run()
-
-                except RuntimeError as re:
-                    log.debug(re)
+                task.run()
 
     def resolve_factory(self):
         return wurfdocs.factory.resolve_factory(

@@ -50,7 +50,7 @@ class SFTPConfig(object):
         assert 'username' in config and config['username']
         assert 'hostname' in config and config['hostname']
         assert 'remote_path' in config and config['remote_path']
-        assert 'source_path' in config and config['source_path']
+        assert 'local_path' in config and config['local_path']
 
         # Optional
         if not 'exclude_patterns' in config:

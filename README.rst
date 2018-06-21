@@ -19,8 +19,8 @@ live in the root of the repository.
 Let's say we want to generate the Sphinx documentation for a specific
 repository.
 
-Example: godot
---------------
+Example: ``urllib3``
+--------------------
 
 ``giit`` uses a ``giit.json`` file to describe the different steps::
 
@@ -30,18 +30,149 @@ Example: godot
             "scripts": [
                 "sphinx-build -b html . ${build_path}"
             ],
-            "cwd": "${source_path}",
-            "pip_packages": [
-                "sphinx",
-                "sphinx_rtd_theme"
-            ]
+            "cwd": "${source_path}/docs",
+            "requirements": "${source_path}/docs/requirements.txt"
         }
     }
-Lets build the ``godot`` Sphinx documentation
-(https://github.com/godotengine/godot-docs) by running ``giit``::
 
-    giit docs https://github.com/godotengine/godot-docs.git --json_config ./giit.json
+Lets build the ``urllib3`` Sphinx documentation
+(https://urllib3.readthedocs.io/en/latest/) by running ``giit``::
 
+    giit docs https://github.com/urllib3/urllib3.git --json_config ./giit.json
+
+You should now seem something like::
+
+    Lets go!
+    Using git repository: https://github.com/urllib3/urllib3.git
+    Running: git clone in /tmp/giit/data/clones/urllib3-b1919a
+    Building into: /tmp/giit/build/urllib3-b1919a
+    Python: sphinx-build -b html . /tmp/giit/build/urllib3-b1919a
+
+
+
+
+``giit.json``
+=============
+
+The ``giit.json`` is where the different steps are defined. Let's
+walk though the different attributes which can be used.
+
+Defining steps
+--------------
+
+The different steps define the behavior we can invoke, in
+the following ``giit.json`` we define three steps::
+
+    {
+        "docs": {
+            ...
+        },
+        "landing_page": {
+            ...
+        },
+        "publish": {
+            ...
+        }
+    }
+
+Step type
+----------
+
+Each step will have a type. The type defines the behavior and
+attributes available in the step.
+
+Currently supported are ``python`` and ``sftp``
+
+Step scope
+----------
+
+If enabled a step will run in a number of different "scopes":
+
+* ``workingtree``:
+  * If a user passes a path to the ``giit`` command e.g.
+    ``giit docs ../dev/project/docs`` then the ``workingtree`` scope will
+    be enabled.
+  * The step will run once with the variable ``source_path`` set to
+    local path.
+  * This allows a user to run steps without having to first
+    push to the remote git repository.
+* ``source_branch``:
+  * The source branch scope will default to ``master``.
+  * If a user passes a path to ``giit`` the source branch will be whatever
+    branch the local repository is on.
+  * The source branch can also be selected by the user when passing
+    a git URL to the ``giit`` command.
+* ``tag``:
+  * A default ``giit`` will run the step for each tag on the repository
+    in this scope.
+
+As a default all steps default to only run in the ``source_branch``
+scope. This can be change with the ``scope`` step attribute.
+
+Step built-in variables
+-----------------------
+
+When defining a step ``giit`` makes a number of variables available.
+
+As an example in the following we can customize the output location
+of ``sphinx-build`` like this::
+
+    {
+        "docs": {
+            "type": "python",
+            "scripts": [
+                "sphinx-build -b html . ${build_path}"
+            ]
+            ...
+        }
+        ...
+    }
+
+In the above ``${build_path}`` will be substituted for the default
+``giit`` build path or a user specified one.
+
+The following built-in variables are available:
+
+* ``build_path``: The path where the produced output should go.
+
+Step user variables
+--------------------
+
+
+
+
+``python`` step
+...............
+
+The ``python`` step supports the following attributes:
+
+* ``scripts``: A list of commands to execute
+* ``cwd``: The path where commands will be executed
+* ``requirements``: Path to a ``pip`` requirements file containing
+  dependencies to be installed. If specified a virtualenv will
+  created.
+* ``pip_packages``: A list of ``pip`` packages to install. If
+  specified a virtualenv will created.
+* ``scope``: A list of ``scope`` names for which the step will run.
+  See sect
+
+Step variables
+--------------
+
+In each step variables can be used to customize the behavior.
+
+Built-in variables
+..................
+
+The following built in variables are available in all steps:
+
+* ``source_path``: This is the path to the
+
+
+
+
+``giit`` command line arguments
+===============================
 
 
 

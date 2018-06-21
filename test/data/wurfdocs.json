@@ -38,7 +38,7 @@
         "hostname": "buildbot.steinwurf.dk",
         "username": "buildbot",
         "remote_path": "/tmp/www/docs/stub",
-        "source_path": "${build_path}",
+        "local_path": "${build_path}",
         "exclude_patterns": [
             "${build_path}/workingtree/*"
         ]

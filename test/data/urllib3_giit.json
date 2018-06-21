@@ -5,10 +5,6 @@
             "sphinx-build -b html . ${build_path}"
         ],
         "cwd": "${source_path}/docs",
-        "pip_packages": [
-            "sphinx",
-            "sphinxcontrib-log-cabinet",
-            "pallets-sphinx-themes"
-        ]
+        "requirements": "${source_path}/docs/requirements.txt"
     }
 }

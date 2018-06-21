@@ -25,7 +25,7 @@ def test_filetransfer(testdirectory):
     filetransfer = wurfdocs.sftp_transfer.SFTPTransfer(ssh=ssh)
     filetransfer.connect(hostname='buildbot.steinwurf.dk', username='buildbot')
 
-    filetransfer.transfer(source_path=testdirectory.path(),
+    filetransfer.transfer(local_path=testdirectory.path(),
                           remote_path='/tmp',
                           exclude_patterns=[])
 
@@ -92,7 +92,7 @@ def test_filelist(testdirectory):
 
     result = list(filelist)
 
-    source_result = [f.source_file for f in result]
+    source_result = [f.local_file for f in result]
     remote_result = [f.remote_file for f in result]
 
     # There should be 4 files

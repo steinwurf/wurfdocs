@@ -25,10 +25,10 @@ class SFTPTransfer(object):
         self.ssh.connect(hostname=hostname,
                          username=username)
 
-    def transfer(self, source_path, remote_path, exclude_patterns):
+    def transfer(self, local_path, remote_path, exclude_patterns):
         """ Start a transfer.
 
-        :param source_path: A local directory to be transferred.
+        :param local_path: A local directory to be transferred.
         :param remote_path: The remote location where the files should be
             copied.
         :param exclude_patterns: A list of path patterns which should not
@@ -36,7 +36,7 @@ class SFTPTransfer(object):
         """
 
         filelist = wurfdocs.filelist.FileList(
-            source_path=source_path,
+            local_path=local_path,
             remote_path=remote_path,
             exclude_patterns=exclude_patterns)
 
@@ -52,14 +52,14 @@ class SFTPTransfer(object):
 
             for fileinfo in filelist:
                 self._transfer_file(sftp=sftp,
-                                    source_file=fileinfo.source_file,
+                                    local_file=fileinfo.local_file,
                                     remote_file=fileinfo.remote_file)
 
-    def _transfer_file(self, sftp, source_file, remote_file):
+    def _transfer_file(self, sftp, local_file, remote_file):
         """ Transfer a file.
 
         :param sftp: The SFTP client ot use.
-        :param source_file: The path to the local file
+        :param local_file: The path to the local file
         :param remote_file: The path to the remote file.
         """
 
@@ -74,7 +74,7 @@ class SFTPTransfer(object):
                 sftp.mkdir(path=path)
                 sftp.chdir(path=path)
 
-        sftp.put(localpath=source_file, remotepath=remote_file)
+        sftp.put(localpath=local_file, remotepath=remote_file)
 
     @staticmethod
     def _path_split(remote_file):
