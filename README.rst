@@ -213,7 +213,7 @@ The ``python`` step supports the following attributes:
 ``giit`` command line arguments
 ===============================
 
-
+The
 
 Developer docs
 ==============
@@ -408,96 +408,3 @@ subdirectory:
 
 
 ]
-
-sphinx/docs/1.0.0
-sphinx/docs/2.0.0
-sphinx/docs/2.1.0
-sphinx/docs/3.0.0
-sphinx/docs/latest
-sphinx/experimental/trying_new_stuff
-sphinx/experimental/new_idea
-
-
-landing_page/experimental/trying_new_stuff
-landing_page/experimental/new_idea
-landing_page/latest
-
-
-We also need to support if the ``script`` to run changes over time. This means
-that we have to be able to version build steps:
-
-The following variables are available:
-
-* Globally
-    * build_path
-    * clone_path
-
-* ``tag`` scope
-    * tag_name
-* ``branch`` scope
-    * branch_name
-* ``workingtree`` scope
-
-variables are defined as a 3 tuple:
-scope:selector:name
-
-scope = { 'tag', 'source_branch', 'workingtree'}
-
-for 'tag and 'branch' scope the optional selector can be used to match either
-branch or tag name. The selector has to be an exact match.
-
-The final element is the name of the variable.
-{
-    'command':
-    {
-        'build':[
-        {
-            'type': 'python'
-            'script': python sphinx-build -b html . ${output_path},
-            'requirements': '${clone_path}/docs/requirements.txt'
-            'cwd': ${clone_path}/docs',
-            'allow_failure': True,
-            'recurse_tags': True,
-            'variables':
-                'source_branch:master:output_path': '{build_path}/docs/latest'
-                'source_branch:output_path': '{build_path}/sphinx/experiments/${branch_name}
-                'tag:output_path': '{build_path]/docs/${tag_name$}'
-                'workingtree:output_path': '{build_path}/sphinx/experiments/workingtree
-        },
-        {
-            'type': 'python'
-            'script': 'python generate.py --versions=${build_path}/docs --output_path=${output_path}'
-            'requirements': '${clone_path}/landing_page/requirements.txt'
-            'cwd': ${clone_path}/landing_page',
-            'allow_failure': True,
-            'variables':
-                'source_branch:master:output_path': '{build_path}'
-                'source_branch:output_path': '{build_path}/landing_page/experiments/${branch_name}
-                'workingtree:output_path': '{build_path}/landing_page/experiments/workingtree
-        }],
-        'publish':[
-            {
-                'type': 'push',
-                'remote_branch': 'gh_pages',
-                'exclude_paths: [
-                    '{build_path}/landing_page/experiments/workingtree',
-                    '{build_path}/sphinx/experiments/workingtree'
-                ],
-                'remote_path': '.',
-                'source_path': '${build_path}'
-            }
-        ]
-}
-
-
-
-
-Use-case: Branch changes build
-
-    * We are on a branch and moves some files. Since source branch is not the
-      we only update the '*' catch all build command. Everything works fine
-      and now we merge. But on the master it fails since we forgot to change the
-      'master' source branch command.
-
-
-
