@@ -1,8 +1,6 @@
-import os
-
-import wurfdocs
-import wurfdocs.run
+import giit
+#import giit.run
 
 
-def test_run(testdirectory):
-    wurfdocs.run.run('python --version', cwd=testdirectory.path())
+# def test_run(testdirectory):
+#     r = giit.run('python --version', cwd=testdirectory.path())

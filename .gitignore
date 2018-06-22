@@ -17,7 +17,7 @@ pytest_environment_*
 pytest_*
 virtualenv-*
 dist
-wurfdocs.egg-info
+giit.egg-info
 pip_packages
 build_current
 .pytest_cache

@@ -48,13 +48,9 @@ def options(opt):
         help='Set the prefix folder where pytest executes the tests')
 
     opt.add_option(
-        '--run_download_tests', default=False, action='store_true',
-        help='Run the unit tests that use network resources'
-        ' (downloading Doxygen')
-
-    opt.add_option(
-        '--run_ensure_doxygen', default=False, action='store_true',
-        help='Ensure that doxygen is available (will retrieve a fresh copy)')
+        '--test_filter', default=None, action='store',
+        help='Runs all tests that include the substring specified.'
+             'Wildcards not allowed. (Used with --run_tests)')
 
 
 def configure(conf):
@@ -74,7 +70,7 @@ def build(bld):
     # when we build a wheel. But, it is - perhaps in the future there will
     # be some way to disable its creation.
     egg_info = os.path.join(
-        bld.path.abspath(), 'pytest_testdirectory.egg-info')
+        'src', 'giit.egg-info')
 
     if os.path.isdir(egg_info):
         waflib.extras.wurf.directory.remove_directory(path=egg_info)
@@ -112,8 +108,8 @@ def _pytest(bld):
 
     with _create_virtualenv(bld=bld) as venv:
 
-        venv.pip_install(['pytest', 'pytest-testdirectory',
-                          'sphinx', 'mock', 'vcrpy'])
+        venv.pip_install(
+            ['pytest', 'pytest-testdirectory', 'mock'])
 
         # Install the pytest-testdirectory plugin in the virtualenv
         wheel = _find_wheel(ctx=bld)
@@ -138,53 +134,29 @@ def _pytest(bld):
         os.makedirs(basetemp)
 
         # If we need to be able to run doxygen from the system
-        # venv.env['PATH'] = os.path.pathsep.join(
-        #    [venv.env['PATH'], os.environ['PATH']])
+        venv.env['PATH'] = os.path.pathsep.join(
+            [venv.env['PATH'], os.environ['PATH']])
 
         # Main test command
         command = 'python -B -m pytest {} --basetemp {}'.format(
             testdir.abspath(), os.path.join(basetemp, 'unit_tests'))
 
-        # Skip the tests that have the "download_test" marker
-        command += ' -m "not download_test and not ensure_doxygen"'
+        # Adds the test filter if specified
+        if bld.options.test_filter:
+            command += ' -k "{}"'.format(bld.options.test_filter)
 
         # Make python not write any .pyc files. These may linger around
         # in the file system and make some tests pass although their .py
         # counter-part has been e.g. deleted
         venv.run(cmd=command, cwd=bld.path)
 
-        if bld.options.run_download_tests:
-            # Main test command
-            command = 'python -B -m pytest {} --basetemp {}'.format(
-                testdir.abspath(), os.path.join(basetemp, 'download_tests'))
-
-            # Skip the tests that have the "download_test" marker
-            command += ' -m "download_test"'
-
-            # Make python not write any .pyc files. These may linger around
-            # in the file system and make some tests pass although their .py
-            # counter-part has been e.g. deleted
-            venv.run(cmd=command, cwd=bld.path)
-
-        if bld.options.run_ensure_doxygen:
-            # Main test command
-            command = 'python -B -m pytest {} --basetemp {}'.format(
-                testdir.abspath(), os.path.join(basetemp, 'ensure_doxygen'))
-
-            # Skip the tests that have the "download_test" marker
-            command += ' -m "ensure_doxygen"'
-
-            # Make python not write any .pyc files. These may linger around
-            # in the file system and make some tests pass although their .py
-            # counter-part has been e.g. deleted
-            venv.run(cmd=command, cwd=bld.path)
-
         # Check readme
         # https://stackoverflow.com/a/49107899/1717320
-        venv.run(cmd='python setup.py check -r -s', cwd=bld.path)
+        # venv.run(cmd='python setup.py check -r -s', cwd=bld.path)
 
-        venv.pip_install(['collective.checkdocs'])
-        venv.run(cmd='python setup.py checkdocs', cwd=bld.path)
+        #
+        # venv.pip_install(['collective.checkdocs'])
+        # venv.run(cmd='python setup.py checkdocs', cwd=bld.path)
 
 
 def _create_virtualenv(bld):
@@ -198,7 +170,3 @@ def _create_virtualenv(bld):
         [bld.dependency_path('virtualenv')])})
 
     return bld.create_virtualenv(cwd=bld.bldnode.abspath(), env=env)
-
-
-def ok():
-    pass
