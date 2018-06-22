@@ -66,8 +66,8 @@ def test_push_command(testdirectory):
                      "commit", "-m", "'giit push'"],
             cwd='/tmp/giit_push'),
         mock.call.run(
-            command=['git', 'push', '--force', '--quite',
-                     "'git@github.com:org/project.git'",
+            command=['git', 'push', '--force',
+                     "git@github.com:org/project.git",
                      'master:gh-pages'],
             cwd='/tmp/giit_push')
     ]
