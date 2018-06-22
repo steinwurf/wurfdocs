@@ -50,3 +50,21 @@ def test_variables_not_found():
 
     with pytest.raises(AttributeError):
         r = v.expand(element='$out likes')
+
+
+def test_variables_empty():
+
+    variables = ''
+
+    context = {
+        'scope': 'tag',
+        'name': '1.0.0',
+        'build_path': '/tmp/build',
+        'source_path': '/tmp/clone'
+    }
+
+    v = giit.variables_reader.VariablesReader(
+        variables=variables, context=context)
+
+    r = v.expand(element='$build_path')
+    assert r == '/tmp/build'

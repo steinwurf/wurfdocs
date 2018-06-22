@@ -4,17 +4,21 @@
 import os
 import sys
 import hashlib
+import tempfile
+import shutil
 
 import giit.config_reader
+import giit.copy_directory
 
 
-class GhPagesCommand(object):
+class PushCommand(object):
 
-    def __init__(self, config, log):
+    def __init__(self, prompt, config, log):
         """
         :param config: A PushConfig object
         :param log: The log to use
         """
+        self.prompt = prompt
         self.config = config
         self.log = log
 
@@ -26,37 +30,65 @@ class GhPagesCommand(object):
 
         self.log.debug("context=%s", context)
 
-        self.git.fetch(all=True, cwd=cwd)
-
-        _, others = self.git.branch(cwd=cwd, remote=True)
-
-        if current == 'gh_pages' or 'gh_pages' in
-
         reader = giit.config_reader.ConfigReader(
             config=self.config, context=context)
 
-    def _ensure_gh_pages(self):
+        # We allow / to be the root of the remote branch, but
+        # we need to handle that a bit carefully. Since the
 
-        # Do we already have a checkout
-        branches = self.git.local_branches(cwd=cwd)
+        temp_path = os.path.join(tempfile.gettempdir(), 'giit_push')
 
-        if 'gh-pages' in branches:
-            return
+        if os.path.isdir(temp_path):
+            shutil.rmtree(temp_path, ignore_errors=True)
 
-        # Is the branch already on the remote
-        branches = self.git.remote_branches(cwd=cwd)
+        directory = giit.copy_directory.CopyDirectory()
 
-        if 'origin/gh-pages' in branches:
-            return
+        from_path = reader.from_path
+        to_path = self._to_path(
+            repository_path=temp_path, to_path=reader.to_path)
 
-        # We need to create it
+        exclude_patterns = reader.exclude_patterns
 
-        _, others = self.git.branch(cwd=cwd, remote=True)
+        directory.copy(from_path=from_path,
+                       to_path=to_path,
+                       exclude_patterns=exclude_patterns)
 
-        if 'origin/gh-pages' in others:
-            self.git.checkout(branch=)
+        command = ["git", "init"]
+        self.prompt.run(command=command, cwd=temp_path)
 
-    def _init_gh_pages(self):
-        self.log.info('Creating gh_pages branch')
+        command = ["git", "add", "."]
+        self.prompt.run(command=command, cwd=temp_path)
 
-        self.git.checkout()
+        commit_name = reader.commit_name
+        commit_email = reader.commit_email
+
+        command = ["git", "-c", "user.name='{}'".format(commit_name),
+                   "-c", "user.email='{}'".format(commit_email),
+                   "commit", "-m", "'giit push'"]
+        self.prompt.run(command=command, cwd=temp_path)
+
+        git_url = reader.git_url
+        target_branch = reader.target_branch
+
+        self.log.info("Pushing %s to branch %s", from_path,
+                      target_branch)
+
+        command = [
+            'git', 'push', '--force',
+            "{}".format(git_url),
+            'master:{}'.format(target_branch)
+        ]
+
+        self.prompt.run(command=command, cwd=temp_path)
+
+    @staticmethod
+    def _to_path(repository_path, to_path):
+
+        if os.path.isabs(to_path):
+            # Make path relative
+            to_path = '.' + to_path
+
+        path = os.path.join(repository_path, to_path)
+        path = os.path.normpath(path)
+
+        return path

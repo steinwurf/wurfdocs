@@ -4,9 +4,50 @@
 import os
 import fnmatch
 import paramiko
+import shutil
 
+import giit.fileinfo
 import giit.filelist
 import giit.sftp_transfer
+import giit.copy_directory
+
+
+def test_copydirectory(testdirectory):
+
+    from_dir = testdirectory.mkdir('from')
+    to_dir = testdirectory.mkdir('to')
+
+    mkdir_layout(from_dir)
+
+    directory = giit.copy_directory.CopyDirectory()
+
+    excludes = [
+        os.path.join(from_dir.path(), 'c/d/*'),
+        os.path.join(from_dir.path(), 'a/*')
+    ]
+
+    directory.copy(from_path=from_dir.path(),
+                   to_path=to_dir.path(),
+                   exclude_patterns=excludes)
+
+    # Get the files
+    files = []
+
+    for root, _, filenames in os.walk(to_dir.path()):
+        for filename in filenames:
+            files.append(os.path.join(root, filename))
+
+    assert len(files) == 4
+
+    file1 = os.path.join(to_dir.path(), 'b/b.txt')
+    file2 = os.path.join(to_dir.path(), 'b/c/b_c.txt')
+    file3 = os.path.join(to_dir.path(), 'c/c.txt')
+    file4 = os.path.join(to_dir.path(), 'd/d.txt')
+
+    assert file1 in files
+    assert file2 in files
+    assert file3 in files
+    assert file4 in files
 
 
 def test_filetransfer(testdirectory):

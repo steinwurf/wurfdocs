@@ -26,7 +26,7 @@ class SFTPCommand(object):
         :param context: A dict containing the context of the command
         """
 
-        self.log.debug("RUN context=%s", context)
+        self.log.debug("context=%s", context)
 
         reader = giit.config_reader.ConfigReader(
             config=self.config, context=context)

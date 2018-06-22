@@ -22,3 +22,8 @@ def test_build(testdirectory):
            '--json_config', config_file]
 
     testdirectory.run(cmd)
+
+    cmd = ['giit', 'gh_pages', url,
+           '--json_config', config_file]
+
+    testdirectory.run(cmd)

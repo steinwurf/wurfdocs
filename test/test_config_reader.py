@@ -41,3 +41,22 @@ def test_config_reader():
 
     for script in reader.scripts:
         assert script == 'python test.py yuyu hip hap /tmp/build'
+
+
+def test_config_reader_empty():
+
+    config = {
+        'to_path': '${build_path}',
+        'variables': ''
+    }
+
+    context = {
+        'scope': 'tag',
+        'name': '1.0.0',
+        'build_path': '/tmp/build'
+    }
+
+    reader = giit.config_reader.ConfigReader(
+        config=config, context=context)
+
+    assert reader.to_path == '/tmp/build'

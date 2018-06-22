@@ -13,12 +13,12 @@ class ConfigReader(object):
         """
         self.config = config
         self.variables = giit.variables_reader.VariablesReader(
-            variables=config.variables, context=context)
+            variables=config['variables'], context=context)
 
     def __getattr__(self, attribute):
 
         if not attribute in self.config:
-            raise AttributeError("Not found")
+            raise AttributeError("Attribute %s not in config" % attribute)
 
         element = self.config[attribute]
 

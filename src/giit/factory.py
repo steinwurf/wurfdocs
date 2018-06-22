@@ -21,6 +21,8 @@ import giit.python_command
 import giit.sftp_config
 import giit.sftp_transfer
 import giit.sftp_command
+import giit.push_config
+import giit.push_command
 
 
 class Factory(object):
@@ -216,6 +218,13 @@ def require_sftp_config(factory):
         config=config)
 
 
+def require_push_config(factory):
+
+    config = factory.require(name='config')
+    return giit.push_config.PushConfig.from_dict(
+        config=config)
+
+
 def require_python_environement(factory):
 
     prompt = factory.require(name='prompt')
@@ -292,6 +301,16 @@ def provide_sftp_command(factory):
     return giit.sftp_command.SFTPCommand(config=config, sftp=sftp, log=log)
 
 
+def provide_push_command(factory):
+
+    config = factory.require(name='command_config')
+    prompt = factory.require(name='prompt')
+    log = logging.getLogger(name='giit.PushCommand')
+
+    return giit.push_command.PushCommand(
+        config=config, prompt=prompt, log=log)
+
+
 def build_sftp_factory(factory):
 
     factory.set_default_build(default_build='require_task_generator')
@@ -318,6 +337,29 @@ def build_sftp_factory(factory):
     return factory
 
 
+def build_push_factory(factory):
+
+    factory.set_default_build(default_build='require_task_generator')
+
+    factory.provide_function(
+        name='command_config', function=require_push_config)
+
+    factory.provide_function(
+        name='command', function=provide_push_command)
+
+    factory.provide_function(
+        name='ssh', function=provide_ssh)
+
+    factory.provide_function(
+        name='require_task_generator', function=require_task_generator)
+
+    factory.provide_value(name='git_binary', value='git')
+    factory.provide_function(name='git', function=require_git)
+    factory.provide_function(name='prompt', function=require_prompt)
+
+    return factory
+
+
 def build_factory(build_type):
 
     factory = Factory()
@@ -327,6 +369,9 @@ def build_factory(build_type):
 
     if build_type == 'sftp':
         return build_sftp_factory(factory=factory)
+
+    if build_type == 'push':
+        return build_push_factory(factory=factory)
 
     raise RuntimeError("%s not a known build type" % build_type)
 

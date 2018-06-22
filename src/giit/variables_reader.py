@@ -40,8 +40,8 @@ class VariablesReader(object):
     def __getitem__(self, key):
 
         variable = self._find_item(key=key)
-        return string.Template(variable).safe_substitute(self)
+        return string.Template(variable).substitute(self)
 
     def expand(self, element):
 
-        return string.Template(element).safe_substitute(self)
+        return string.Template(element).substitute(self)
