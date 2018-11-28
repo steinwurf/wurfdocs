@@ -118,8 +118,8 @@ documentation folder. readthedocs.org can be configured to use the
 ``requirements.txt`` when building a project. Simply put ``wurfdocs`` in to the
 ``requirements.txt``.
 
-Relase new version
-==================
+Release new version
+===================
 
 1. Edit ``NEWS.rst``, ``wscript`` and ``src/wurfdocs/wurfdocs.py`` (set
    correct ``VERSION``)
